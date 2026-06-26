@@ -26,12 +26,12 @@
         @endphp
         <nav x-data="{ mobileMenuOpen: false }" class="bg-[#1e40af] text-white sticky top-0 z-40 shadow-lg border-b border-blue-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
-                
+
                 <!-- Left: Burger & Branding with Logo -->
                 <div class="flex items-center space-x-3">
-                    <!-- Burger Icon (Mobile only — public/end-user pages) -->
+                    <!-- Burger Icon (public/end-user pages) -->
                     @unless($hidePublicMobileMenu)
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="md:hidden text-blue-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 p-1.5 rounded-xl hover:bg-white/10 transition" aria-label="Toggle menu">
+                    <button @click="mobileMenuOpen = !mobileMenuOpen" type="button" class="inline-flex text-blue-100 hover:text-white focus:outline-none focus:ring-2 focus:ring-white/50 p-1.5 rounded-xl hover:bg-white/10 transition" aria-label="Toggle menu">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         </svg>
@@ -43,7 +43,7 @@
                         <img src="{{ asset('images/logo.png') }}" class="w-10 h-10 object-contain rounded-full bg-white p-0.5 border border-blue-200 shadow-sm transition group-hover:scale-105" alt="SK Namayan Logo">
                         <span class="text-sm font-extrabold tracking-wider text-white uppercase font-display">SK Namayan</span>
                     </a>
-                    
+
                     <!-- Desktop Link -->
                     <a href="{{ route('news.index') }}" class="hidden md:inline-flex text-xs sm:text-sm font-bold text-blue-100 hover:text-white transition pl-4 border-l border-blue-400/40 font-display uppercase tracking-wider">
                         News
@@ -97,11 +97,11 @@
             </div>
 
             @unless($hidePublicMobileMenu)
-            <!-- Mobile Menu Left-Side Drawer Overlay & Panel (Mobile only) -->
-            <div x-show="mobileMenuOpen" 
-                 class="fixed inset-0 z-50 md:hidden" 
+            <!-- Menu Drawer Overlay & Panel -->
+            <div x-show="mobileMenuOpen"
+                 class="fixed inset-0 z-50"
                  x-cloak>
-                 
+
                  <!-- Backdrop backdrop-blur-sm -->
                  <div x-show="mobileMenuOpen"
                       x-transition:enter="transition-opacity ease-out duration-300"
@@ -122,7 +122,7 @@
                       x-transition:leave-start="translate-x-0"
                       x-transition:leave-end="-translate-x-full"
                       class="fixed inset-y-0 left-0 w-[75%] max-w-[320px] bg-[#1e40af] text-white shadow-2xl flex flex-col justify-between z-50 border-r border-blue-800">
-                      
+
                       <!-- Header inside Drawer -->
                       <div class="px-5 py-4 flex items-center justify-between border-b border-blue-800">
                           <div class="flex items-center space-x-2">
@@ -159,7 +159,7 @@
                                           <span>My Requests</span>
                                       </a>
                                   @endif
-                                  
+
                                   @if(Auth::user()->canAccessDashboard())
                                       <a href="{{ route('dashboard.index') }}" @click="mobileMenuOpen = false" class="flex items-center space-x-3 px-4 py-3 rounded-2xl text-blue-100 hover:text-white hover:bg-blue-800 font-bold font-display uppercase tracking-wider transition">
                                           <svg class="w-5 h-5 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" /></svg>
@@ -196,7 +196,7 @@
             <div x-data="{ showFlashModal: true }" x-show="showFlashModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-cloak>
                 <!-- Backdrop with blur -->
                 <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300" @click="showFlashModal = false"></div>
-                
+
                 <!-- Card Container -->
                 <div class="relative bg-white rounded-[2rem] shadow-2xl max-w-[340px] w-full overflow-hidden border border-slate-100 transform transition-all duration-300 z-50 flex flex-col items-center pb-8"
                      x-show="showFlashModal"
@@ -206,7 +206,7 @@
                      x-transition:leave="transition ease-in duration-200"
                      x-transition:leave-start="opacity-100 scale-100"
                      x-transition:leave-end="opacity-0 scale-95">
-                    
+
                     @if (session('success'))
                         <!-- Top Half (Green header for success) -->
                         <div class="w-full bg-[#10b981] flex items-center justify-center py-10 relative">
@@ -217,7 +217,7 @@
                                 </svg>
                             </div>
                         </div>
-                        
+
                         <!-- Bottom Half -->
                         <div class="p-6 w-full flex flex-col items-center text-center space-y-3">
                             <h3 class="text-xl font-bold text-slate-800 font-display">Success</h3>
@@ -235,7 +235,7 @@
                                 </svg>
                             </div>
                         </div>
-                        
+
                         <!-- Bottom Half -->
                         <div class="p-6 w-full flex flex-col items-center text-center space-y-3">
                             <h3 class="text-xl font-bold text-slate-800 font-display">Error</h3>
@@ -244,7 +244,7 @@
                             </p>
                         </div>
                     @endif
-                    
+
                     <!-- Okay Button -->
                     <button @click="showFlashModal = false" class="mt-2 px-10 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-md active:scale-95 transition-all duration-150 cursor-pointer min-w-[140px]">
                         Okay

@@ -1,26 +1,23 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="flex-1 flex flex-col min-h-0 bg-[#f0f2f5] dark:bg-slate-950 font-sans">
+<div class="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-950 font-sans">
 
-    {{-- Page header --}}
-    <section class="bg-[#f0f2f5] dark:bg-slate-950 shrink-0">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[max(1.25rem,env(safe-area-inset-top))] pb-2 md:pb-6">
-            <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4 min-w-0">
-                <a href="{{ route('landing') }}" class="hover:text-[#1e40af] dark:hover:text-blue-400 active:scale-95 transition shrink-0">Home</a>
+    <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-[#1e3a8a] text-white shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[max(1.5rem,env(safe-area-inset-top))] pb-8 md:py-16">
+            <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-5 min-w-0">
+                <a href="{{ route('landing') }}" class="hover:text-white active:scale-95 shrink-0">Home</a>
                 <span aria-hidden="true" class="shrink-0">/</span>
-                <span class="text-slate-700 dark:text-slate-200 truncate" aria-current="page">SK Officials</span>
+                <span class="text-white truncate" aria-current="page">SK Officials</span>
             </nav>
-            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-                <div class="space-y-1">
-                    <h1 class="text-2xl md:text-3xl font-black font-display text-slate-900 dark:text-white tracking-tight">SK Officials</h1>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md leading-relaxed">Elected youth leaders of Barangay Namayan Mandaluyong.</p>
-                </div>
-                <a href="{{ route('transparency.index') }}"
-                   class="inline-flex items-center justify-center min-h-11 px-5 rounded-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold shadow-sm hover:shadow active:scale-95 transition-all duration-200 shrink-0">
-                    Transparency Board
-                </a>
+            <div class="max-w-2xl space-y-2.5">
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-black uppercase tracking-widest">Community Leadership</span>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display uppercase tracking-tight leading-tight">SK Officials</h1>
+                <p class="text-sm text-slate-300 leading-relaxed">Meet the elected youth leaders of Barangay Namayan and learn more about their roles and programs.</p>
             </div>
+            <a href="{{ route('transparency.index') }}" class="inline-flex items-center min-h-11 mt-6 px-5 bg-white/10 hover:bg-white/20 border border-white/20 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition-all">
+                View Transparency Board →
+            </a>
         </div>
     </section>
 
