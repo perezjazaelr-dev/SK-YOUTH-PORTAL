@@ -42,18 +42,11 @@
                 </div>
 
                 <!-- Logo Image Upload -->
-                <div>
+                <div class="space-y-1.5">
                     <label for="logo" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                         Logo Image <span class="text-rose-500 font-extrabold">*</span>
                     </label>
-                    <input 
-                        type="file" 
-                        id="logo" 
-                        name="logo" 
-                        required 
-                        accept="image/*" 
-                        class="field focus:ring-4 focus:ring-blue-600/10 file:mr-4 file:py-1.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#1e40af] hover:file:bg-blue-100"
-                    >
+                    <x-file-upload name="logo" required="true" accept="image/*" placeholder="Drag the logo image here or click to browse." />
                     <span class="text-[10px] text-slate-400 mt-1 block">Supports PNG, JPG, JPEG, SVG or WebP. Max file size: 2MB.</span>
                     @error('logo')
                         <span class="text-rose-600 text-xs font-semibold mt-1 block">{{ $message }}</span>

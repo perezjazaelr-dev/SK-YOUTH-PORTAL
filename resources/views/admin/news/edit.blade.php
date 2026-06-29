@@ -66,24 +66,13 @@
                         </div>
 
                         <!-- Cover Image -->
-                        <div class="space-y-1">
+                        <div class="space-y-1.5">
                             <label class="text-[10px] font-bold text-slate-455 uppercase tracking-wider block">Cover / Feature Photo (Optional)</label>
-                            <input 
-                                type="file" 
-                                name="image" 
-                                class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-1.5"
-                            >
+                            <x-file-upload name="image" accept="image/*" placeholder="Drag your cover photo here or click to browse." existing-url="{{ $news->image_path ? asset('storage/' . $news->image_path) : null }}" />
                             <span class="text-[9px] text-slate-400 block mt-0.5">Leave blank to keep current cover image. Supported: JPG, PNG, WEBP.</span>
                             @error('image')
                                 <span class="text-rose-655 text-[10px] font-semibold block mt-1">{{ $message }}</span>
                             @enderror
-                            
-                            @if($news->image_path)
-                                <div class="mt-3 flex items-center space-x-3 bg-slate-50 border border-slate-100 p-2 rounded-xl w-fit">
-                                    <img src="{{ asset('storage/' . $news->image_path) }}" class="w-16 h-10 object-cover rounded-lg" alt="Current image">
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Current Cover</span>
-                                </div>
-                            @endif
                         </div>
                     </div>
 

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 font-sans" x-data="{
+<div class="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-950 font-sans" x-data="{
     step: 1,
     partOfOrg: '{{ old('part_of_youth_org', '0') }}',
     isPwd: '{{ old('pwd', '0') }}',
@@ -101,18 +101,27 @@
 }">
 
     <!-- Page Header -->
-    <div class="mb-8 pb-6 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase block">Youth Portal</span>
-            <h1 class="text-2xl font-black text-slate-800 font-display uppercase tracking-tight mt-1">Katipunan ng Kabataan Self Profiling</h1>
-            <p class="text-xs text-slate-500 mt-1">Please complete all steps of the KK Profiling registry form to verify your residency and citizen status.</p>
+    <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-[#1e3a8a] text-white shrink-0">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-[max(1.5rem,env(safe-area-inset-top))] pb-8 md:py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="max-w-2xl space-y-2.5">
+                <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-5 min-w-0">
+                    <a href="{{ route('landing') }}" class="hover:text-white active:scale-95 shrink-0">Home</a>
+                    <span aria-hidden="true" class="shrink-0">/</span>
+                    <span class="text-white truncate" aria-current="page">Profiling</span>
+                </nav>
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-black uppercase tracking-widest">Youth Portal</span>
+                <h1 class="text-2xl sm:text-3xl font-black font-display uppercase tracking-tight leading-tight">Katipunan ng Kabataan Self Profiling</h1>
+                <p class="text-sm text-slate-300 leading-relaxed">Please complete all steps of the KK Profiling registry form to verify your residency and citizen status.</p>
+            </div>
+            <a href="{{ route('profile.my-requests') }}" class="inline-flex items-center min-h-10 px-4 bg-white/10 hover:bg-white/20 border border-white/20 font-bold text-xs uppercase tracking-wider rounded-xl active:scale-95 transition-all text-white shrink-0 self-start sm:self-center">
+                &larr; Return to Portal
+            </a>
         </div>
-        <a href="{{ route('profile.my-requests') }}" class="btn-outline text-xs py-2 px-4 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition cursor-pointer font-bold inline-block shrink-0 text-center">
-            &larr; Return to Portal
-        </a>
-    </div>
+    </section>
 
-    <!-- Form Card -->
+    <!-- Main Content Container -->
+    <div class="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex-1 flex flex-col">
+        <!-- Form Card -->
     <div class="bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm">
         
         <form id="profileForm" method="POST" action="{{ route('profile.profiling.store') }}" class="p-6 md:p-8 space-y-6">
@@ -473,6 +482,6 @@
             </div>
         </form>
     </div>
-
+    </div>
 </div>
 @endsection

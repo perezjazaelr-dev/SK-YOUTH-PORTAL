@@ -1,20 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 font-sans">
-            
-            <!-- Page Header -->
-            <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-100">
-                <div>
-                    <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase block">Citizen Portal</span>
-                    <h1 class="text-2xl font-black text-slate-800 font-display uppercase tracking-tight mt-1">My Submitted Requests</h1>
-                    <p class="text-xs text-slate-500 mt-1">Review and monitor the status of requests submitted under your email address ({{ auth()->user()->email }}).</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <a href="/" class="btn-primary text-xs py-2 px-4 shadow-sm bg-[#1e40af] hover:bg-blue-700 font-bold rounded-xl text-white transition cursor-pointer">New Request</a>
-                    <a href="{{ route('profile.edit') }}" class="btn-outline text-xs py-2 px-4 border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition cursor-pointer font-bold">Account Settings</a>
-                </div>
+<div class="flex-1 flex flex-col min-h-0 bg-slate-50 dark:bg-slate-950 font-sans">
+
+    <!-- Page Header -->
+    <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-[#1e3a8a] text-white shrink-0">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-[max(1.5rem,env(safe-area-inset-top))] pb-8 md:py-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div class="max-w-2xl space-y-2.5">
+                <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-5 min-w-0">
+                    <a href="{{ route('landing') }}" class="hover:text-white active:scale-95 shrink-0">Home</a>
+                    <span aria-hidden="true" class="shrink-0">/</span>
+                    <span class="text-white truncate" aria-current="page">Portal</span>
+                </nav>
+                <span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-black uppercase tracking-widest">Citizen Portal</span>
+                <h1 class="text-2xl sm:text-3xl font-black font-display uppercase tracking-tight leading-tight">My Submitted Requests</h1>
+                <p class="text-sm text-slate-300 leading-relaxed">Review and monitor the status of requests submitted under your email address ({{ auth()->user()->email }}).</p>
             </div>
+            <div class="flex items-center gap-2 mt-6 sm:mt-0 self-start sm:self-center">
+                <a href="/" class="inline-flex items-center min-h-10 px-4 bg-white text-slate-900 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider rounded-xl active:scale-95 transition-all shadow-sm">New Request</a>
+                <a href="{{ route('profile.edit') }}" class="inline-flex items-center min-h-10 px-4 bg-white/10 hover:bg-white/20 border border-white/20 font-bold text-xs uppercase tracking-wider rounded-xl active:scale-95 transition-all text-white">Account Settings</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 flex-1 flex flex-col">
 
             <!-- Session Notifications -->
             @if(session('success'))
@@ -205,35 +215,50 @@
         </div>
     @endif
 
-    <!-- Stat count badges in a simple, professional row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm">
             <div>
-                <span class="block text-2xl font-black text-slate-800">{{ $total }}</span>
+                <span class="block text-2xl font-black text-slate-800 dark:text-slate-200">{{ $total }}</span>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Total Filed</span>
             </div>
-            <div class="w-8 h-8 rounded-lg bg-slate-50 text-slate-400 flex items-center justify-center font-bold text-sm">📋</div>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-450 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+            </div>
         </div>
-        <div class="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-amber-400">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-amber-400">
             <div>
-                <span class="block text-2xl font-black text-slate-800">{{ $pending }}</span>
+                <span class="block text-2xl font-black text-slate-800 dark:text-slate-200">{{ $pending }}</span>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pending</span>
             </div>
-            <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-500 flex items-center justify-center font-bold text-sm">⏳</div>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-450 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
         </div>
-        <div class="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-emerald-500">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-emerald-500">
             <div>
-                <span class="block text-2xl font-black text-slate-800">{{ $approved }}</span>
+                <span class="block text-2xl font-black text-slate-800 dark:text-slate-200">{{ $approved }}</span>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Approved</span>
             </div>
-            <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-500 flex items-center justify-center font-bold text-sm">✓</div>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-450 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
         </div>
-        <div class="bg-white border border-slate-100 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-rose-500">
+        <div class="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex items-center justify-between shadow-sm border-l-4 border-l-rose-500">
             <div>
-                <span class="block text-2xl font-black text-slate-800">{{ $declined }}</span>
+                <span class="block text-2xl font-black text-slate-800 dark:text-slate-200">{{ $declined }}</span>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Declined</span>
             </div>
-            <div class="w-8 h-8 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center font-bold text-sm">✗</div>
+            <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 text-blue-600 dark:text-blue-450 flex items-center justify-center">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </div>
         </div>
     </div>
 
@@ -304,5 +329,6 @@
                     </tbody>
                 </table>
         @endif
+    </div>
 </div>
 @endsection

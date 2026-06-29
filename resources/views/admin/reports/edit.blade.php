@@ -46,25 +46,11 @@
                     <x-form-input type="date" label="Reporting Period" name="reporting_period" required="true" :value="$report->reporting_period ? $report->reporting_period->format('Y-m-d') : ''" />
                     
                     <!-- File Upload Input -->
-                    <div>
+                    <div class="space-y-1.5">
                         <label for="file" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
                             Replace Report Document File <span class="text-slate-400 font-normal">(Optional)</span>
                         </label>
-                        @if($report->file_path)
-                            <div class="mb-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center space-x-2 text-xs text-slate-600">
-                                <span class="font-semibold text-slate-700">Current File:</span>
-                                <a href="{{ asset('storage/' . $report->file_path) }}" target="_blank" class="text-blue-600 hover:underline flex items-center space-x-0.5">
-                                    <span>{{ basename($report->file_path) }}</span>
-                                    <svg class="w-3.5 h-3.5 inline-block text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                                </a>
-                            </div>
-                        @endif
-                        <input 
-                            type="file" 
-                            id="file" 
-                            name="file" 
-                            class="field focus:ring-4 focus:ring-blue-600/10 file:mr-4 file:py-1.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-[#1e40af] hover:file:bg-blue-100 w-full"
-                        >
+                        <x-file-upload name="file" placeholder="Drag your report file here or click to browse." existing-url="{{ $report->file_path ? asset('storage/' . $report->file_path) : null }}" />
                         <span class="text-[10px] text-slate-400 mt-1 block">Supports PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, JPEG. Max file size: 2MB. Leave empty to keep current file.</span>
                         @error('file')
                             <span class="text-rose-600 text-xs font-semibold mt-1 block">{{ $message }}</span>

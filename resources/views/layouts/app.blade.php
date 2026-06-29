@@ -21,6 +21,7 @@
 
         <!-- Scripts & Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
 
         <style>
             [x-cloak] { display: none !important; }
@@ -32,8 +33,9 @@
         @php
             $hidePublicMobileMenu = request()->routeIs('dashboard.*', 'admin.*')
                 || (auth()->check() && auth()->user()->canAccessDashboard() && request()->routeIs('profile.edit'));
+            $hideFooter = $hidePublicMobileMenu;
         @endphp
-        <nav x-data="{ mobileMenuOpen: false }" class="bg-[#1e40af] dark:bg-slate-900 text-white sticky top-0 z-40 shadow-lg border-b border-blue-800 dark:border-slate-800">
+        <nav x-data="{ mobileMenuOpen: false }" class="bg-[#1e40af] text-white sticky top-0 z-40 shadow-lg border-b border-blue-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative">
 
                 <!-- Left: Burger & Branding with Logo -->
@@ -412,6 +414,7 @@
         </main>
 
         <!-- Footer -->
+        @unless($hideFooter)
         <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800 text-xs mt-auto">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -424,7 +427,7 @@
                             Empowering youth governance in Barangay Namayan, Mandaluyong. Offering digitalized solutions for community health, education, sports, and social welfare requests.
                         </p>
                     </div>
-
+ 
                     <!-- Column 2: Quick Links -->
                     <div class="space-y-3">
                         <span class="font-bold text-white uppercase tracking-wider font-display">Services Directory</span>
@@ -440,7 +443,7 @@
                             <li><a href="{{ route('about') }}" class="hover:text-white transition">About Us</a></li>
                         </ul>
                     </div>
-
+ 
                     <!-- Column 3: Accounts and Contact info -->
                     <div class="space-y-3">
                         <span class="font-bold text-white uppercase tracking-wider font-display">Barangay Desk</span>
@@ -460,9 +463,9 @@
                         </div>
                     </div>
                 </div>
-
+ 
                 <hr class="border-slate-800 my-8">
-
+ 
                 <div class="flex flex-col sm:flex-row items-center justify-between text-slate-500">
                     <div>
                         &copy; {{ date('Y') }} Sangguniang Kabataan Namayan. All rights reserved.
@@ -470,6 +473,7 @@
                 </div>
             </div>
         </footer>
+        @endunless
 
         <!-- data-flash auto dismiss helper -->
         <script>
@@ -484,5 +488,6 @@
                 });
             });
         </script>
+        @livewireScripts
     </body>
 </html>

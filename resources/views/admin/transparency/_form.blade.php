@@ -29,20 +29,14 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <div class="space-y-1">
+    <div class="space-y-1.5">
         <label for="image" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Cover Image (optional)</label>
-        @if($post?->imageUrl())
-            <img src="{{ $post->imageUrl() }}" alt="" class="w-full max-w-xs rounded-xl border border-slate-100 mb-2">
-        @endif
-        <input id="image" type="file" name="image" accept="image/jpeg,image/png,image/webp" class="field text-xs min-h-11">
+        <x-file-upload name="image" id="image" accept="image/jpeg,image/png,image/webp" placeholder="Drag cover image here or click to browse." existing-url="{{ $post?->imageUrl() }}" />
         @error('image')<span class="text-rose-600 text-[10px] font-semibold">{{ $message }}</span>@enderror
     </div>
-    <div class="space-y-1">
+    <div class="space-y-1.5">
         <label for="document" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Attach File (PDF/DOC, optional)</label>
-        @if($post?->fileUrl())
-            <a href="{{ $post->fileUrl() }}" target="_blank" class="text-xs text-[#1e40af] font-bold block mb-2">Current file attached ↗</a>
-        @endif
-        <input id="document" type="file" name="document" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*" class="field text-xs min-h-11">
+        <x-file-upload name="document" id="document" accept=".pdf,.doc,.docx,.xls,.xlsx,image/*" placeholder="Drag document/image file here or click to browse." existing-url="{{ $post?->fileUrl() }}" />
         <span class="text-[9px] text-slate-400">Max 8MB. PDF, Word, Excel, or image.</span>
         @error('document')<span class="text-rose-600 text-[10px] font-semibold">{{ $message }}</span>@enderror
     </div>

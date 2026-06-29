@@ -156,7 +156,7 @@
 .dark .text-emerald-800, .dark .text-emerald-900 { color: #34d399 !important; }
 .dark .text-amber-850, .dark .text-amber-900 { color: #fbbf24 !important; }
 .dark .text-rose-850, .dark .text-rose-900 { color: #f87171 !important; }
-.dark .text-blue-855, .dark .text-[#1e40af] { color: #38bdf8 !important; }
+.dark .text-blue-855, .dark .text-\[\#1e40af\] { color: #38bdf8 !important; }
 
 .dark .bg-blue-50\/40 {
     background-color: rgba(30, 64, 175, 0.1) !important;

@@ -65,14 +65,9 @@
                         </div>
 
                         <!-- Cover Image -->
-                        <div class="space-y-1">
+                        <div class="space-y-1.5">
                             <label class="text-[10px] font-bold text-slate-455 uppercase tracking-wider block">Cover / Feature Photo</label>
-                            <input 
-                                type="file" 
-                                name="image" 
-                                required 
-                                class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-1.5"
-                            >
+                            <x-file-upload name="image" required="true" accept="image/*" placeholder="Drag your cover photo here or click to browse." />
                             <span class="text-[9px] text-slate-400 block mt-0.5">Recommended ratio: 16:9 or landscape (max 4MB). Supported: JPG, PNG, WEBP.</span>
                             @error('image')
                                 <span class="text-rose-655 text-[10px] font-semibold block mt-1">{{ $message }}</span>

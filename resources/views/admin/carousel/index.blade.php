@@ -387,16 +387,9 @@
                                 @enderror
                             </div>
 
-                            <div class="space-y-1">
+                            <div class="space-y-1.5">
                                 <label for="slide-image" class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">Slide Background Image</label>
-                                <input
-                                    id="slide-image"
-                                    type="file"
-                                    name="image"
-                                    required
-                                    accept="image/jpeg,image/png,image/webp,image/gif"
-                                    class="field focus:ring-4 focus:ring-blue-600/10 dark:bg-slate-950 dark:border-slate-700 dark:text-slate-100 text-xs py-2 min-h-11 file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[10px] file:font-bold file:bg-blue-50 file:text-[#1e40af] dark:file:bg-blue-950 dark:file:text-blue-300"
-                                >
+                                <x-file-upload name="image" id="slide-image" required="true" accept="image/jpeg,image/png,image/webp,image/gif" placeholder="Drag your background slide image here or click to browse." />
                                 <span class="text-[9px] text-slate-400 dark:text-slate-500 block mt-0.5 leading-relaxed">Recommended ratio: 16:9 (max 4MB). Supported: JPG, PNG, WEBP, GIF.</span>
                                 @error('image')
                                     <span class="text-rose-600 dark:text-rose-400 text-[10px] font-semibold block mt-1">{{ $message }}</span>

@@ -13,12 +13,9 @@
     </div>
 </div>
 
-<div class="space-y-1">
+<div class="space-y-1.5">
     <label for="photo" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Official Photo {{ $official ? '(optional — leave blank to keep current)' : '' }}</label>
-    @if($official?->photoUrl())
-        <img src="{{ $official->photoUrl() }}" alt="" class="w-20 h-20 rounded-xl object-cover border border-slate-100 mb-2">
-    @endif
-    <input id="photo" type="file" name="photo" {{ $official ? '' : 'required' }} accept="image/jpeg,image/png,image/webp" class="field text-xs min-h-11">
+    <x-file-upload name="photo" id="photo" required="{{ $official ? 'false' : 'true' }}" accept="image/jpeg,image/png,image/webp" placeholder="Drag photo here or click to browse." existing-url="{{ $official?->photoUrl() }}" />
     @error('photo')<span class="text-rose-600 text-[10px] font-semibold">{{ $message }}</span>@enderror
 </div>
 
