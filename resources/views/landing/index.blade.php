@@ -121,318 +121,22 @@
     }
 }" class="space-y-16">
 
-    <!-- 1. Hero Carousel (Alpine.js, 4 slides, autoplay 5s, arrows, dots, Unsplash) -->
-    <section x-data="{
-        activeSlide: 0,
-        slides: {{ json_encode($formattedSlides) }},
-        next() { this.activeSlide = (this.activeSlide + 1) % this.slides.length },
-        prev() { this.activeSlide = (this.activeSlide - 1 + this.slides.length) % this.slides.length },
-        init() { setInterval(() => this.next(), 5000) }
-    }" class="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-        <div class="relative h-[280px] sm:h-[360px] md:h-[450px] rounded-3xl overflow-hidden shadow-lg border border-slate-100 bg-slate-900 carousel-shadow">
-            
-            <template x-for="(slide, index) in slides" :key="index">
-                <div x-show="activeSlide === index"
-                     x-transition:enter="transition ease-out duration-700"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     x-transition:leave="transition ease-in duration-500"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95"
-                     class="absolute inset-0 bg-cover bg-center flex flex-col justify-end text-white p-6 sm:p-12 md:p-16"
-                     :style="`background-image: linear-gradient(to top, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.4)), url(${slide.image})`">
-                    
-                    <div class="relative z-10 max-w-2xl space-y-4">
-                        <span class="bg-blue-600/35 border border-blue-400/20 text-blue-200 text-[9px] font-black uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full backdrop-blur-md">Barangay Namayan SK</span>
-                        <h2 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight font-display text-white leading-tight" x-text="slide.title"></h2>
-                        <p class="text-slate-300 text-xs sm:text-sm md:text-base max-w-xl font-medium leading-relaxed" x-text="slide.desc"></p>
-                        <div class="flex flex-wrap gap-3 pt-2">
-                            <a :href="slide.url1" @click.prevent="handleCtaClick(slide.url1)" class="btn-primary" x-text="slide.cta1"></a>
-                            <a href="{{ route('track.index') }}" class="btn-outline text-white hover:text-[#1e40af] border-white/20 hover:bg-white">
-                                Track Request
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </template>
+    @include('landing.sections.hero-carousel')
 
-            <!-- Slide Nav Arrows -->
-            <button @click="prev()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/25 border border-white/10 backdrop-blur-md text-white flex items-center justify-center transition active:scale-95 group">
-                <svg class="w-5 h-5 group-hover:-translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
-            </button>
-            <button @click="next()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/25 border border-white/10 backdrop-blur-md text-white flex items-center justify-center transition active:scale-95 group">
-                <svg class="w-5 h-5 group-hover:translate-x-0.5 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
-            </button>
+    @include('landing.sections.quick-actions')
 
-            <!-- Dots -->
-            <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2.5">
-                <template x-for="(slide, index) in slides" :key="index">
-                    <button @click="activeSlide = index"
-                            class="w-2.5 h-2.5 rounded-full transition-all duration-300"
-                            :class="activeSlide === index ? 'bg-white w-6 shadow-sm' : 'bg-white/30 hover:bg-white/55'"></button>
-                </template>
-            </div>
-        </div>
-    </section>
+    @include('landing.sections.featured-programs')
 
-    <!-- 2. Quick Action Strip (5 inline buttons for the 4 main forms + Track Request) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4 flex flex-wrap items-center justify-center gap-3">
-            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider px-3">Quick Forms:</span>
-            <a href="{{ route('forms.health.create') }}" @click.prevent="openForm('health')" class="btn-outline btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="health" class="w-4 h-4 text-emerald-600" />
-                <span>Health Consult</span>
-            </a>
-            <a href="{{ route('forms.mental-health.create') }}" @click.prevent="openForm('mental-health')" class="btn-outline btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="mental-health" class="w-4 h-4 text-purple-600" />
-                <span>Mental Support</span>
-            </a>
-            <a href="{{ route('forms.medicine.create') }}" @click.prevent="openForm('medicine')" class="btn-outline btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="medicine" class="w-4 h-4 text-amber-600" />
-                <span>Pabili Medicine</span>
-            </a>
-            <a href="{{ route('forms.silid.create') }}" @click.prevent="openForm('silid')" class="btn-outline btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="education" class="w-4 h-4 text-indigo-600" />
-                <span>Silid Study</span>
-            </a>
-            <a href="{{ route('forms.sports.create') }}" @click.prevent="openForm('sports')" class="btn-outline btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="sports" class="w-4 h-4 text-blue-600" />
-                <span>Sports League</span>
-            </a>
-            <a href="{{ route('track.index') }}" class="btn-primary btn-sm space-x-1.5 shadow-sm">
-                <x-category-icon name="track" class="w-4 h-4" />
-                <span>Track Request</span>
-            </a>
-        </div>
-    </section>
+    @include('landing.sections.highlighted-programs')
 
-    <!-- 3. Title Projects Grid (10-column layout) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-8">
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase font-display">Interactive Catalog</span>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 font-display mt-1.5 uppercase">Our Services</h1>
-            <p class="text-xs text-slate-400 mt-2 max-w-md mx-auto">Select a project area below to see subtopics, check schedules, or apply for service assistance in Barangay Namayan.</p>
-        </div>
+    @include('landing.sections.news-section')
 
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-            @foreach($categories as $key => $cat)
-                <a href="{{ route('projects.committee', ['project_slug' => 'sk-namayan-youth-services', 'committee_slug' => $key]) }}"
-                   class="h-32 bg-white border border-slate-100 hover:border-[#1e40af] text-slate-700 hover:text-[#1e40af] hover:-translate-y-1 hover:shadow-md transition-all duration-300 rounded-2xl flex flex-col justify-center items-center text-center p-5 group relative overflow-hidden active:scale-95">
-                    
-                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100 group-hover:scale-105 transition duration-200 mb-3">
-                        <x-category-icon name="{{ $key }}" class="w-6 h-6 text-blue-600" />
-                    </div>
-
-                    <span class="font-extrabold text-[10px] sm:text-xs tracking-wider uppercase font-display leading-tight">{{ $cat['label'] }}</span>
-                </a>
-            @endforeach
-        </div>
-    </section>
-
-    <!-- 5. Featured Programs Cards (3-column grid) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-8">
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase font-display">Featured Initiatives</span>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 font-display mt-1.5 uppercase">Highlighted Programs</h1>
-            <p class="text-xs text-slate-400 mt-2 max-w-sm mx-auto">Explore the three most requested programs directly managed by our youth representatives.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Health Consultation -->
-            <div class="card flex flex-col justify-between h-full hover:-translate-y-1 hover:shadow-md transition">
-                <div class="space-y-3">
-                    <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                        <x-category-icon name="health" class="w-5 h-5 text-emerald-600" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide font-display">Health Consultation</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        Access qualified medical and mental wellness services. Book private consultation check-up appointments safely online.
-                    </p>
-                </div>
-                <div class="pt-5 border-t border-slate-100 mt-5">
-                    <a href="{{ route('forms.health.create') }}" @click.prevent="openForm('health')" class="btn-primary w-full">Book Consultation</a>
-                </div>
-            </div>
-
-            <!-- Silid Karunungan -->
-            <div class="card flex flex-col justify-between h-full hover:-translate-y-1 hover:shadow-md transition">
-                <div class="space-y-3">
-                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                        <x-category-icon name="education" class="w-5 h-5 text-indigo-600" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide font-display">Silid Karunungan</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        Reserve dedicated workspace slots in our modern local library. Study in a quiet environment with high-speed internet.
-                    </p>
-                </div>
-                <div class="pt-5 border-t border-slate-100 mt-5">
-                    <a href="{{ route('forms.silid.create') }}" @click.prevent="openForm('silid')" class="btn-primary w-full">Book Library Slot</a>
-                </div>
-            </div>
-
-            <!-- Pabili Medicine -->
-            <div class="card flex flex-col justify-between h-full hover:-translate-y-1 hover:shadow-md transition">
-                <div class="space-y-3">
-                    <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                        <x-category-icon name="medicine" class="w-5 h-5 text-amber-600" />
-                    </div>
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wide font-display">Pabili Medicine</h3>
-                    <p class="text-xs text-slate-500 leading-relaxed">
-                        SK Pabili Medicine assists youth households with medicine purchases. Submit address details to arrange deliveries.
-                    </p>
-                </div>
-                <div class="pt-5 border-t border-slate-100 mt-5">
-                    <a href="{{ route('forms.medicine.create') }}" @click.prevent="openForm('medicine')" class="btn-primary w-full">Apply for Medicine</a>
-                </div>
-        </div>
-    </section>
-
-    <!-- News Section (Featured & Recent) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        <!-- Header Section -->
-        <div class="text-center mb-8">
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase font-display">Namayan Feed</span>
-            <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 font-display mt-1.5 uppercase">News Articles</h1>
-            <p class="text-xs text-slate-400 mt-2 max-w-sm mx-auto">Stay updated with the latest community reports, athletic achievements, and local stories.</p>
-        </div>
-
-        <!-- Featured & Recent Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <!-- Left Column: Featured Article (Col span 7) -->
-            @if($featuredArticle)
-                <div class="lg:col-span-7 flex flex-col group">
-                    <a href="{{ route('news.show', $featuredArticle->slug) }}" class="block overflow-hidden rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition duration-300 relative aspect-video bg-slate-50">
-                        @if($featuredArticle->image_path)
-                            @if(str_starts_with($featuredArticle->image_path, 'http'))
-                                <img src="{{ $featuredArticle->image_path }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $featuredArticle->title }}">
-                            @else
-                                <img src="{{ asset('storage/' . $featuredArticle->image_path) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" alt="{{ $featuredArticle->title }}">
-                            @endif
-                        @else
-                            <div class="w-full h-full flex items-center justify-center">
-                                <span class="text-slate-350 text-3xl">📷</span>
-                            </div>
-                        @endif
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
-                        <div class="absolute bottom-5 left-5 right-5 space-y-2">
-                            <span class="bg-blue-600 text-white text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-md">{{ $featuredArticle->category }}</span>
-                            <span class="text-white/80 text-[10px] font-bold uppercase tracking-wider ml-2">{{ $featuredArticle->read_time }} Min Read</span>
-                        </div>
-                    </a>
-                    <div class="mt-4 space-y-2">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                            {{ $featuredArticle->published_at ? \Carbon\Carbon::parse($featuredArticle->published_at)->format('M d, Y') : $featuredArticle->created_at->format('M d, Y') }}
-                        </span>
-                        <h2 class="text-lg sm:text-xl font-black text-slate-800 leading-snug tracking-tight font-display hover:text-[#1e40af] transition uppercase">
-                            <a href="{{ route('news.show', $featuredArticle->slug) }}">{{ $featuredArticle->title }}</a>
-                        </h2>
-                        <p class="text-xs text-slate-500 leading-relaxed">
-                            {{ $featuredArticle->excerpt }}
-                        </p>
-                    </div>
-                </div>
-            @endif
-
-            <!-- Right Column: Recent Articles (Col span 5) -->
-            <div class="lg:col-span-5 space-y-6">
-                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 class="text-xs font-black tracking-wider text-slate-400 uppercase font-display">Recent Stories</h3>
-                </div>
-                <div class="space-y-4">
-                    @forelse($recentArticles as $recent)
-                        <div class="flex items-start space-x-4 group">
-                            <a href="{{ route('news.show', $recent->slug) }}" class="w-24 h-16 sm:w-28 sm:h-20 rounded-2xl overflow-hidden border border-slate-100 shrink-0 block relative bg-slate-50">
-                                @if($recent->image_path)
-                                    @if(str_starts_with($recent->image_path, 'http'))
-                                        <img src="{{ $recent->image_path }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $recent->title }}">
-                                    @else
-                                        <img src="{{ asset('storage/' . $recent->image_path) }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="{{ $recent->title }}">
-                                    @endif
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center">
-                                        <span class="text-slate-350 text-lg">📷</span>
-                                    </div>
-                                @endif
-                            </a>
-                            <div class="space-y-1">
-                                <div class="flex items-center space-x-2">
-                                    <span class="text-[9px] font-extrabold text-[#1e40af] uppercase tracking-wider">{{ $recent->category }}</span>
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">•</span>
-                                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{{ $recent->read_time }} Min Read</span>
-                                </div>
-                                <h4 class="text-xs font-extrabold text-slate-800 hover:text-[#1e40af] transition font-display uppercase leading-tight line-clamp-2">
-                                    <a href="{{ route('news.show', $recent->slug) }}">{{ $recent->title }}</a>
-                                </h4>
-                                <p class="text-[10px] text-slate-450 leading-relaxed line-clamp-2">
-                                    {{ $recent->excerpt }}
-                                </p>
-                            </div>
-                        </div>
-                    @empty
-                        <p class="text-slate-400 text-xs py-4">No recent articles found.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 6. Announcements Accordion (Alpine.js, type-aware colors) -->
-    <section class="max-w-3xl mx-auto px-4 sm:px-6">
-        <div class="text-center mb-8">
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase font-display">Latest Broadcasts</span>
-            <h1 class="text-2xl font-black tracking-tight text-slate-800 font-display mt-1.5 uppercase">Announcements</h1>
-            <p class="text-xs text-slate-400 mt-2">Check active policy broadcasts, eligibility definitions, and public updates below.</p>
-        </div>
-
-        @if($announcements->isEmpty())
-            <div class="text-center py-8 text-slate-400 text-xs bg-slate-50 border border-slate-100 rounded-2xl">
-                No active announcements at the moment. Check back later!
-            </div>
-        @else
-            <div x-data="{ activeAccordion: 0 }" class="space-y-3">
-                @foreach($announcements as $index => $ann)
-                    @php
-                        // Type color bindings
-                        $headerClass = match($ann->type) {
-                            'success' => 'bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border-emerald-100',
-                            'warning' => 'bg-amber-50 text-amber-800 hover:bg-amber-100 border-amber-100',
-                            'info' => 'bg-blue-50 text-blue-800 hover:bg-blue-100 border-blue-100',
-                            default => 'bg-slate-50 text-slate-800 hover:bg-slate-100 border-slate-100'
-                        };
-                        $bodyClass = match($ann->type) {
-                            'success' => 'bg-emerald-50/20 border-emerald-100/50 text-slate-700',
-                            'warning' => 'bg-amber-50/20 border-amber-100/50 text-slate-700',
-                            'info' => 'bg-blue-50/20 border-blue-100/50 text-slate-700',
-                            default => 'bg-slate-50/20 border-slate-100/50 text-slate-700'
-                        };
-                    @endphp
-                    
-                    <div class="border rounded-2xl overflow-hidden transition duration-200">
-                        <button @click="activeAccordion = (activeAccordion === {{ $index }} ? null : {{ $index }})"
-                                class="w-full text-left px-5 py-4 font-bold text-xs tracking-wider uppercase flex items-center justify-between transition {{ $headerClass }}">
-                            <span class="font-display">{{ $ann->title }}</span>
-                            <svg class="w-4 h-4 transform transition-transform duration-200" 
-                                 :class="activeAccordion === {{ $index }} ? 'rotate-180' : ''" 
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
-                        </button>
-                        
-                        <div x-show="activeAccordion === {{ $index }}" 
-                             x-collapse 
-                             class="p-5 text-xs leading-relaxed border-t {{ $bodyClass }}">
-                            <p class="mb-3">{{ $ann->body }}</p>
-                            <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider block">Published: {{ $ann->published_at->format('M d, Y h:i A') }}</span>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </section>
+    @include('landing.sections.announcements')
 
     <!-- 7. CTA Banner (Full-bleed gradient banner, blobs) -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 reveal-on-scroll">
         <div class="relative rounded-3xl bg-gradient-to-r from-blue-700 to-indigo-900 text-white py-12 px-6 sm:p-16 overflow-hidden text-center shadow-lg">
-            
+
             <!-- Decorative gradient blobs -->
             <div class="absolute -top-16 -left-16 w-48 h-48 bg-blue-500/20 rounded-full blur-2xl"></div>
             <div class="absolute -bottom-16 -right-16 w-56 h-56 bg-indigo-500/20 rounded-full blur-2xl"></div>
@@ -460,7 +164,7 @@
 
     <!-- 8. Sponsor/Partners logo slider -->
     @if(!$partners->isEmpty())
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 reveal-on-scroll">
         <div class="text-center mb-6">
             <span class="text-[9px] font-black tracking-widest text-slate-400 uppercase font-display block">Sponsors & Partners</span>
             <h2 class="text-lg font-black tracking-tight text-slate-500 font-display uppercase mt-1">Our Community Partners</h2>
@@ -509,14 +213,41 @@
         .animate-marquee:hover {
             animation-play-state: paused;
         }
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 700ms ease, transform 700ms ease;
+        }
+        .reveal-on-scroll.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
     @endif
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.15,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            document.querySelectorAll('.reveal-on-scroll').forEach((element) => observer.observe(element));
+        });
+    </script>
+
     <!-- Overlays / Modals for all forms -->
-    <div x-show="activeForm" 
-         class="fixed inset-0 z-50 overflow-y-auto" 
+    <div x-show="activeForm"
+         class="fixed inset-0 z-50 overflow-y-auto"
          x-cloak>
-        
+
         <!-- Backdrop shadow -->
         <div class="fixed inset-0 bg-slate-950/45 backdrop-blur-sm transition-opacity"></div>
 
@@ -551,20 +282,20 @@
 
         <!-- Modal Wrapper -->
         <div class="flex min-h-screen items-center justify-center p-4">
-            
+
             <!-- Modal Box Container -->
             <div class="max-w-2xl w-full relative z-10 transition-all transform max-h-[90vh] flex flex-col overflow-y-auto"
                  @click.stop>
-                
+
                 <!-- 1. HEALTH CONSULTATION FORM -->
                 <div x-show="activeForm === 'health'" class="w-full relative">
-                    <button type="button" @click="activeForm = null" 
+                    <button type="button" @click="activeForm = null"
                             class="absolute right-4 top-4 text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 p-2 rounded-full transition z-20 focus:outline-none focus:ring-2 focus:ring-white/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <x-form-card 
-                        title="Health Consultation" 
-                        subtitle="Apply for free medical guidance or health services from SK Namayan representatives." 
+                    <x-form-card
+                        title="Health Consultation"
+                        subtitle="Apply for free medical guidance or health services from SK Namayan representatives."
                         action="{{ route('forms.health.store') }}"
                     >
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -596,12 +327,12 @@
                                 <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Additional Information Required</span>
                                 <div class="grid grid-cols-1 gap-4">
                                     @foreach($healthInit->custom_fields as $field)
-                                        <x-form-input 
-                                            label="{{ $field['label'] }}" 
-                                            name="custom_fields[{{ $field['name'] }}]" 
-                                            type="{{ $field['type'] ?? 'text' }}" 
-                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}" 
-                                            placeholder="{{ $field['placeholder'] ?? '' }}" 
+                                        <x-form-input
+                                            label="{{ $field['label'] }}"
+                                            name="custom_fields[{{ $field['name'] }}]"
+                                            type="{{ $field['type'] ?? 'text' }}"
+                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}"
+                                            placeholder="{{ $field['placeholder'] ?? '' }}"
                                         />
                                     @endforeach
                                 </div>
@@ -616,13 +347,13 @@
 
                 <!-- 2. MENTAL HEALTH SUPPORT FORM -->
                 <div x-show="activeForm === 'mental-health'" class="w-full relative">
-                    <button type="button" @click="activeForm = null" 
+                    <button type="button" @click="activeForm = null"
                             class="absolute right-4 top-4 text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 p-2 rounded-full transition z-20 focus:outline-none focus:ring-2 focus:ring-white/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <x-form-card 
-                        title="Mental Health Support Portal" 
-                        subtitle="Confidential counseling and mental wellness assistance for SK Namayan youth." 
+                    <x-form-card
+                        title="Mental Health Support Portal"
+                        subtitle="Confidential counseling and mental wellness assistance for SK Namayan youth."
                         action="{{ route('forms.mental-health.store') }}"
                     >
                         <!-- Confidentiality Banner -->
@@ -662,12 +393,12 @@
                                 <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Additional Information Required</span>
                                 <div class="grid grid-cols-1 gap-4">
                                     @foreach($mentalInit->custom_fields as $field)
-                                        <x-form-input 
-                                            label="{{ $field['label'] }}" 
-                                            name="custom_fields[{{ $field['name'] }}]" 
-                                            type="{{ $field['type'] ?? 'text' }}" 
-                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}" 
-                                            placeholder="{{ $field['placeholder'] ?? '' }}" 
+                                        <x-form-input
+                                            label="{{ $field['label'] }}"
+                                            name="custom_fields[{{ $field['name'] }}]"
+                                            type="{{ $field['type'] ?? 'text' }}"
+                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}"
+                                            placeholder="{{ $field['placeholder'] ?? '' }}"
                                         />
                                     @endforeach
                                 </div>
@@ -682,13 +413,13 @@
 
                 <!-- 3. PABILI MEDICINE SERVICES FORM -->
                 <div x-show="activeForm === 'medicine'" class="w-full relative">
-                    <button type="button" @click="activeForm = null" 
+                    <button type="button" @click="activeForm = null"
                             class="absolute right-4 top-4 text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 p-2 rounded-full transition z-20 focus:outline-none focus:ring-2 focus:ring-white/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <x-form-card 
-                        title="Pabili Medicine Services" 
-                        subtitle="Request essential medicine purchasing support and delivery services to your home." 
+                    <x-form-card
+                        title="Pabili Medicine Services"
+                        subtitle="Request essential medicine purchasing support and delivery services to your home."
                         action="{{ route('forms.medicine.store') }}"
                     >
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -714,12 +445,12 @@
                                 <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Additional Information Required</span>
                                 <div class="grid grid-cols-1 gap-4">
                                     @foreach($medInit->custom_fields as $field)
-                                        <x-form-input 
-                                            label="{{ $field['label'] }}" 
-                                            name="custom_fields[{{ $field['name'] }}]" 
-                                            type="{{ $field['type'] ?? 'text' }}" 
-                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}" 
-                                            placeholder="{{ $field['placeholder'] ?? '' }}" 
+                                        <x-form-input
+                                            label="{{ $field['label'] }}"
+                                            name="custom_fields[{{ $field['name'] }}]"
+                                            type="{{ $field['type'] ?? 'text' }}"
+                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}"
+                                            placeholder="{{ $field['placeholder'] ?? '' }}"
                                         />
                                     @endforeach
                                 </div>
@@ -734,13 +465,13 @@
 
                 <!-- 4. SILID KARUNUNGAN BOOKING FORM -->
                 <div x-show="activeForm === 'silid'" class="w-full relative">
-                    <button type="button" @click="activeForm = null" 
+                    <button type="button" @click="activeForm = null"
                             class="absolute right-4 top-4 text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 p-2 rounded-full transition z-20 focus:outline-none focus:ring-2 focus:ring-white/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <x-form-card 
-                        title="Silid Karunungan Booking" 
-                        subtitle="Book studying slots at local research library facilities with internet access." 
+                    <x-form-card
+                        title="Silid Karunungan Booking"
+                        subtitle="Book studying slots at local research library facilities with internet access."
                         action="{{ route('forms.silid.store') }}"
                     >
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -766,12 +497,12 @@
                                 <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Additional Information Required</span>
                                 <div class="grid grid-cols-1 gap-4">
                                     @foreach($silidInit->custom_fields as $field)
-                                        <x-form-input 
-                                            label="{{ $field['label'] }}" 
-                                            name="custom_fields[{{ $field['name'] }}]" 
-                                            type="{{ $field['type'] ?? 'text' }}" 
-                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}" 
-                                            placeholder="{{ $field['placeholder'] ?? '' }}" 
+                                        <x-form-input
+                                            label="{{ $field['label'] }}"
+                                            name="custom_fields[{{ $field['name'] }}]"
+                                            type="{{ $field['type'] ?? 'text' }}"
+                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}"
+                                            placeholder="{{ $field['placeholder'] ?? '' }}"
                                         />
                                     @endforeach
                                 </div>
@@ -786,13 +517,13 @@
 
                 <!-- 5. SPORTS REGISTRATION FORM -->
                 <div x-show="activeForm === 'sports'" class="w-full relative">
-                    <button type="button" @click="activeForm = null" 
+                    <button type="button" @click="activeForm = null"
                             class="absolute right-4 top-4 text-white hover:text-slate-200 bg-white/10 hover:bg-white/20 p-2 rounded-full transition z-20 focus:outline-none focus:ring-2 focus:ring-white/50">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
-                    <x-form-card 
-                        title="Sports Registration" 
-                        subtitle="Apply for local leagues, sports activities, and tournament registrations organized by SK Namayan." 
+                    <x-form-card
+                        title="Sports Registration"
+                        subtitle="Apply for local leagues, sports activities, and tournament registrations organized by SK Namayan."
                         action="{{ route('forms.sports.store') }}"
                     >
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -826,12 +557,12 @@
                                 <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Additional Information Required</span>
                                 <div class="grid grid-cols-1 gap-4">
                                     @foreach($sportsInit->custom_fields as $field)
-                                        <x-form-input 
-                                            label="{{ $field['label'] }}" 
-                                            name="custom_fields[{{ $field['name'] }}]" 
-                                            type="{{ $field['type'] ?? 'text' }}" 
-                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}" 
-                                            placeholder="{{ $field['placeholder'] ?? '' }}" 
+                                        <x-form-input
+                                            label="{{ $field['label'] }}"
+                                            name="custom_fields[{{ $field['name'] }}]"
+                                            type="{{ $field['type'] ?? 'text' }}"
+                                            required="{{ ($field['required'] ?? false) ? 'true' : 'false' }}"
+                                            placeholder="{{ $field['placeholder'] ?? '' }}"
                                         />
                                     @endforeach
                                 </div>
@@ -850,23 +581,23 @@
 
     <!-- Submission Success Confirmation Modal -->
     @if(session('submitted_success'))
-    <div x-data="{ showSuccess: true }" 
-         x-show="showSuccess" 
-         class="fixed inset-0 z-50 overflow-y-auto" 
+    <div x-data="{ showSuccess: true }"
+         x-show="showSuccess"
+         class="fixed inset-0 z-50 overflow-y-auto"
          x-cloak>
-         
+
          <!-- Backdrop shadow -->
          <div class="fixed inset-0 bg-slate-950/45 backdrop-blur-sm transition-opacity" @click="showSuccess = false"></div>
 
          <!-- Modal Wrapper -->
          <div class="flex min-h-screen items-center justify-center p-4">
-             
+
              <!-- Modal Box -->
              <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-100 max-w-lg w-full relative z-10 p-6 sm:p-8 text-center space-y-6"
                   @click.stop>
-                  
+
                   <!-- Close Button -->
-                  <button type="button" @click="showSuccess = false" 
+                  <button type="button" @click="showSuccess = false"
                           class="absolute right-4 top-4 text-slate-400 hover:text-slate-600 p-2 rounded-full transition focus:outline-none">
                       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
                   </button>

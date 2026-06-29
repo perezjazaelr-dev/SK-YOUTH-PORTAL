@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.staff' => \App\Http\Middleware\EnsureAdminOrStaff::class,
             'admin.only' => \App\Http\Middleware\EnsureAdmin::class,
             'admin.dpo' => \App\Http\Middleware\EnsureAdminOrDpo::class,
+            'kk.profile.completed' => \App\Http\Middleware\EnsureKkProfileCompleted::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

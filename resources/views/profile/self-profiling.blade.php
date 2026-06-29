@@ -3,8 +3,75 @@
 @section('content')
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 font-sans" x-data="{
     step: 1,
-    partOfOrg: '0',
-    isPwd: '0',
+    partOfOrg: '{{ old('part_of_youth_org', '0') }}',
+    isPwd: '{{ old('pwd', '0') }}',
+
+    // Form fields to track for percentage calculation
+    consent_given: {{ old('consent_given', '0') === '1' ? 'true' : 'false' }},
+    surname: '{{ old('surname', $user->last_name ?? '') }}',
+    first_name: '{{ old('first_name', $user->first_name ?? '') }}',
+    middle_name: '{{ old('middle_name', '') }}',
+    ext: '{{ old('ext', '') }}',
+    age: '{{ old('age', '') }}',
+    sex: '{{ old('sex', '') }}',
+    gender: '{{ old('gender', '') }}',
+    dob: '{{ old('dob', '') }}',
+    civil_status: '{{ old('civil_status', '') }}',
+    purok_id: '{{ old('purok_id', '') }}',
+    street_address: '{{ old('street_address', '') }}',
+    contact_number: '{{ old('contact_number', '') }}',
+    registered_sk_voter: '{{ old('registered_sk_voter', '') }}',
+    registered_national_voter: '{{ old('registered_national_voter', '') }}',
+    attended_kk_assembly: '{{ old('attended_kk_assembly', '') }}',
+    youth_org_name: '{{ old('youth_org_name', '') }}',
+    interested_in_joining: '{{ old('interested_in_joining', '') }}',
+    part_of_lgbtqia: '{{ old('part_of_lgbtqia', '') }}',
+    registered_disability: '{{ old('registered_disability', '') }}',
+    highest_educational_attainment: '{{ old('highest_educational_attainment', '') }}',
+
+    get requiredFields() {
+        let fields = [
+            this.consent_given,
+            this.surname,
+            this.first_name,
+            this.age,
+            this.sex,
+            this.dob,
+            this.civil_status,
+            this.purok_id,
+            this.contact_number,
+            this.registered_sk_voter,
+            this.registered_national_voter,
+            this.attended_kk_assembly,
+            this.partOfOrg,
+            this.part_of_lgbtqia,
+            this.isPwd,
+            this.highest_educational_attainment
+        ];
+        
+        if (this.partOfOrg === '1') {
+            fields.push(this.youth_org_name);
+        } else if (this.partOfOrg === '0') {
+            fields.push(this.interested_in_joining);
+        }
+        
+        if (this.isPwd === '1') {
+            fields.push(this.registered_disability);
+        }
+        
+        return fields;
+    },
+
+    get completeness() {
+        const req = this.requiredFields;
+        const filled = req.filter(val => {
+            if (val === true) return true;
+            if (val === false || val === '' || val === null || val === undefined) return false;
+            return String(val).trim().length > 0;
+        }).length;
+        
+        return Math.round((filled / req.length) * 100);
+    },
 
     validateStep(s) {
         const fields = document.querySelectorAll(`#step-${s} [required]`);
@@ -51,6 +118,21 @@
         <form id="profileForm" method="POST" action="{{ route('profile.profiling.store') }}" class="p-6 md:p-8 space-y-6">
             @csrf
 
+            <!-- Validation Errors -->
+            @if($errors->any())
+                <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl text-xs font-semibold space-y-1 animate-fade-in">
+                    <p class="font-bold text-rose-900 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Please resolve the following registration errors:
+                    </p>
+                    <ul class="list-disc pl-5 space-y-0.5 font-medium">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <!-- Step Indicator / Progress Bar -->
             <div class="border-b border-slate-100 pb-5">
                 <div class="flex items-center justify-between text-xs font-semibold text-slate-400 select-none max-w-xl mx-auto">
@@ -87,6 +169,17 @@
                 </div>
             </div>
 
+            <!-- Form Completeness Progress Card -->
+            <div class="bg-blue-50/40 border border-blue-100/50 p-4.5 rounded-2xl mb-4">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-700 mb-1.5">
+                    <span class="uppercase tracking-wider text-slate-550 font-display">Profile Completeness</span>
+                    <span class="text-[#1e40af] text-sm font-black" x-text="completeness + '%'"></span>
+                </div>
+                <div class="w-full bg-slate-100 border border-slate-200/50 h-3 rounded-full overflow-hidden">
+                    <div class="bg-gradient-to-r from-blue-500 to-[#1e40af] h-full rounded-full transition-all duration-300" :style="'width: ' + completeness + '%'"></div>
+                </div>
+            </div>
+
             <!-- STEP 1: Data Privacy Consent -->
             <div x-show="step === 1" id="step-1" class="space-y-4">
                 <h3 class="text-xs font-black text-[#1e40af] uppercase tracking-wider border-b border-slate-100 pb-2">1. Informed Data Privacy Consent</h3>
@@ -104,7 +197,7 @@
                 </div>
                 <div class="mt-4 flex items-start">
                     <div class="flex items-center h-5">
-                        <input id="consent_checkbox" name="consent_given" type="checkbox" value="1" required class="focus:ring-[#1e40af] h-4 w-4 text-[#1e40af] border-slate-350 rounded cursor-pointer">
+                        <input id="consent_checkbox" name="consent_given" type="checkbox" value="1" required x-model="consent_given" class="focus:ring-[#1e40af] h-4 w-4 text-[#1e40af] border-slate-350 rounded cursor-pointer">
                     </div>
                     <div class="ml-3 text-xs">
                         <label for="consent_checkbox" class="font-bold text-slate-700 cursor-pointer select-none">I have read and understood the Data Privacy Consent Notice and hereby give my voluntary consent to the collection, processing, use, and storage of my personal data for SK profiling purposes.</label>
@@ -119,22 +212,22 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Surname <span class="text-rose-500">*</span></label>
-                        <input type="text" name="surname" value="{{ old('surname') }}" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Dela Cruz">
+                        <input type="text" name="surname" value="{{ old('surname') }}" x-model="surname" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Dela Cruz">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">First Name <span class="text-rose-500">*</span></label>
-                        <input type="text" name="first_name" value="{{ old('first_name', explode(' ', $user->name)[0] ?? '') }}" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Juan">
+                        <input type="text" name="first_name" value="{{ old('first_name', explode(' ', $user->name)[0] ?? '') }}" x-model="first_name" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Juan">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Middle Name</label>
-                        <input type="text" name="middle_name" value="{{ old('middle_name') }}" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Santiago">
+                        <input type="text" name="middle_name" value="{{ old('middle_name') }}" x-model="middle_name" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Santiago">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Suffix (Ext.)</label>
-                        <select name="ext" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <select name="ext" x-model="ext" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                             <option value="">None</option>
                             <option value="Jr.">Jr.</option>
                             <option value="Sr.">Sr.</option>
@@ -145,11 +238,11 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Age <span class="text-rose-500">*</span></label>
-                        <input type="number" name="age" value="{{ old('age') }}" min="15" max="30" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="15 to 30">
+                        <input type="number" name="age" value="{{ old('age') }}" x-model="age" min="15" max="30" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="15 to 30">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Sex <span class="text-rose-500">*</span></label>
-                        <select name="sex" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <select name="sex" x-model="sex" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                             <option value="">Select Sex</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
@@ -157,18 +250,18 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Gender Identity</label>
-                        <input type="text" name="gender" value="{{ old('gender') }}" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. LGBTQIA+">
+                        <input type="text" name="gender" value="{{ old('gender') }}" x-model="gender" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. LGBTQIA+">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date of Birth <span class="text-rose-500">*</span></label>
-                        <input type="date" name="dob" value="{{ old('dob') }}" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <input type="date" name="dob" value="{{ old('dob') }}" x-model="dob" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Civil Status <span class="text-rose-500">*</span></label>
-                        <select name="civil_status" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <select name="civil_status" x-model="civil_status" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                             <option value="">Select Civil Status</option>
                             <option value="Single">Single</option>
                             <option value="Married">Married</option>
@@ -179,7 +272,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Youth Classification <span class="text-rose-500">*</span></label>
-                        <select name="youth_classification" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <select name="youth_classification" x-model="youth_classification" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                             <option value="">Select Classification</option>
                             <option value="ISY">In-School Youth (ISY)</option>
                             <option value="OSY">Out-of-School Youth (OSY)</option>
@@ -191,7 +284,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Purok (Barangay Namayan) <span class="text-rose-500">*</span></label>
-                        <select name="purok_id" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                        <select name="purok_id" x-model="purok_id" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
                             <option value="">Select Purok</option>
                             @foreach($puroks as $purok)
                                 <option value="{{ $purok->id }}">
@@ -202,18 +295,18 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Street Address</label>
-                        <input type="text" name="street_address" value="{{ old('street_address') }}" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. 594 J.P Rizal Street">
+                        <input type="text" name="street_address" value="{{ old('street_address') }}" x-model="street_address" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. 594 J.P Rizal Street">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Contact Number <span class="text-rose-500">*</span></label>
-                        <input type="text" name="contact_number" value="{{ old('contact_number') }}" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. 09171234567">
+                        <input type="text" name="contact_number" value="{{ old('contact_number') }}" x-model="contact_number" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. 09171234567">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email Address <span class="text-rose-500">*</span></label>
-                        <input type="email" name="email" value="{{ $user->email }}" disabled class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-100 border border-slate-200 rounded-xl cursor-not-allowed" placeholder="e.g. citizen@namayan.local">
+                        <input type="email" name="email" value="{{ $user->email }}" readonly class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-100 border border-slate-200 rounded-xl cursor-not-allowed" placeholder="e.g. citizen@namayan.local">
                     </div>
                 </div>
             </div>
@@ -228,11 +321,11 @@
                         <span class="block font-bold text-slate-500 uppercase text-[10px]">Registered SK Voter? <span class="text-rose-500">*</span></span>
                         <div class="flex items-center space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="registered_sk_voter" value="1" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="registered_sk_voter" value="1" x-model="registered_sk_voter" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="registered_sk_voter" value="0" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="registered_sk_voter" value="0" x-model="registered_sk_voter" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">No</span>
                             </label>
                         </div>
@@ -243,11 +336,11 @@
                         <span class="block font-bold text-slate-500 uppercase text-[10px]">Registered National Voter? <span class="text-rose-500">*</span></span>
                         <div class="flex items-center space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="registered_national_voter" value="1" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="registered_national_voter" value="1" x-model="registered_national_voter" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="registered_national_voter" value="0" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="registered_national_voter" value="0" x-model="registered_national_voter" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">No</span>
                             </label>
                         </div>
@@ -258,11 +351,11 @@
                         <span class="block font-bold text-slate-500 uppercase text-[10px]">Attended KK Assembly? <span class="text-rose-500">*</span></span>
                         <div class="flex items-center space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="attended_kk_assembly" value="1" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="attended_kk_assembly" value="1" x-model="attended_kk_assembly" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="attended_kk_assembly" value="0" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="attended_kk_assembly" value="0" x-model="attended_kk_assembly" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">No</span>
                             </label>
                         </div>
@@ -287,7 +380,7 @@
                 <!-- Youth Org Name (Conditional if Yes) -->
                 <div x-show="partOfOrg === '1'" x-transition class="space-y-2" x-cloak>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Name of Youth Organization <span class="text-rose-500">*</span></label>
-                    <input type="text" name="youth_org_name" value="{{ old('youth_org_name') }}" :required="partOfOrg === '1'" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Sangguniang Kabataan Movement">
+                    <input type="text" name="youth_org_name" value="{{ old('youth_org_name') }}" x-model="youth_org_name" :required="partOfOrg === '1'" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Sangguniang Kabataan Movement">
                 </div>
 
                 <!-- Interested in joining (Conditional if No) -->
@@ -295,11 +388,11 @@
                     <span class="block font-bold text-slate-500 uppercase text-[10px]">Interested in joining a Youth Organization? <span class="text-rose-500">*</span></span>
                     <div class="flex items-center space-x-4">
                         <label class="inline-flex items-center">
-                            <input type="radio" name="interested_in_joining" value="1" :required="partOfOrg === '0'" class="text-[#1e40af] focus:ring-[#1e40af]">
+                            <input type="radio" name="interested_in_joining" value="1" x-model="interested_in_joining" :required="partOfOrg === '0'" class="text-[#1e40af] focus:ring-[#1e40af]">
                             <span class="ml-2">Yes</span>
                         </label>
                         <label class="inline-flex items-center">
-                            <input type="radio" name="interested_in_joining" value="0" :required="partOfOrg === '0'" class="text-[#1e40af] focus:ring-[#1e40af]">
+                            <input type="radio" name="interested_in_joining" value="0" x-model="interested_in_joining" :required="partOfOrg === '0'" class="text-[#1e40af] focus:ring-[#1e40af]">
                             <span class="ml-2">No</span>
                         </label>
                     </div>
@@ -316,11 +409,11 @@
                         <span class="block font-bold text-slate-500 uppercase text-[10px]">Part of the LGBTQIA+ Community? <span class="text-rose-500">*</span></span>
                         <div class="flex items-center space-x-4">
                             <label class="inline-flex items-center">
-                                <input type="radio" name="part_of_lgbtqia" value="1" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="part_of_lgbtqia" value="1" x-model="part_of_lgbtqia" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">Yes</span>
                             </label>
                             <label class="inline-flex items-center">
-                                <input type="radio" name="part_of_lgbtqia" value="0" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <input type="radio" name="part_of_lgbtqia" value="0" x-model="part_of_lgbtqia" required class="text-[#1e40af] focus:ring-[#1e40af]">
                                 <span class="ml-2">No</span>
                             </label>
                         </div>
@@ -345,13 +438,13 @@
                 <!-- Disability Name (Conditional if Yes) -->
                 <div x-show="isPwd === '1'" x-transition class="space-y-2" x-cloak>
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Registered Disability <span class="text-rose-500">*</span></label>
-                    <input type="text" name="registered_disability" value="{{ old('registered_disability') }}" :required="isPwd === '1'" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Visual Impairment">
+                    <input type="text" name="registered_disability" value="{{ old('registered_disability') }}" x-model="registered_disability" :required="isPwd === '1'" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Visual Impairment">
                 </div>
 
                 <!-- Highest Educational Attainment -->
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Highest Educational Attainment <span class="text-rose-500">*</span></label>
-                    <input type="text" name="highest_educational_attainment" value="{{ old('highest_educational_attainment') }}" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. College Graduate, 2nd Year College">
+                    <input type="text" name="highest_educational_attainment" value="{{ old('highest_educational_attainment') }}" x-model="highest_educational_attainment" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. College Graduate, 2nd Year College">
                 </div>
             </div>
             

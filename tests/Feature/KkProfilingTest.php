@@ -360,7 +360,8 @@ class KkProfilingTest extends TestCase
         $this->assertStringContainsString('Surname', $content);
         $this->assertStringContainsString('First Name', $content);
         $this->assertStringContainsString('Garcia', $content);
-        $this->assertStringContainsString('maria.garcia@example.com', $content);
+        $this->assertStringNotContainsString('********', $content);
+        $this->assertStringNotContainsString('maria.garcia@example.com', $content);
     }
 
     public function test_admin_or_staff_can_update_profile_and_creates_audit_log(): void
@@ -471,6 +472,366 @@ class KkProfilingTest extends TestCase
             'subject_type' => KkProfile::class,
             'subject_id' => $profile->id,
         ]);
+    }
+
+    public function test_superadmin_can_view_raw_profiling_pii_and_export_pii(): void
+    {
+        $superadmin = User::factory()->create(['role' => 'superadmin', 'is_approved' => true]);
+
+        $profile = KkProfile::create([
+            'surname' => 'Dela Cruz',
+            'first_name' => 'Juan',
+            'age' => 18,
+            'sex' => 'Male',
+            'dob' => '2008-01-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => 'juan@example.com',
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => true,
+            'registered_disability' => 'Visual Impairment',
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+
+        // Dashboard List View
+        $response = $this->actingAs($superadmin)->get('/dashboard/profiling');
+        $response->assertOk();
+        $response->assertSee('2008-01-20');
+        $response->assertSee('09171234567');
+        $response->assertSee('juan@example.com');
+        $response->assertSee('Visual Impairment');
+
+        // CSV Export
+        $exportResponse = $this->actingAs($superadmin)->get('/dashboard/export/profiling');
+        $exportResponse->assertOk();
+        $exportContent = $exportResponse->streamedContent();
+        $this->assertStringContainsString('2008-01-20', $exportContent);
+        $this->assertStringContainsString('09171234567', $exportContent);
+        $this->assertStringContainsString('juan@example.com', $exportContent);
+        $this->assertStringContainsString('Visual Impairment', $exportContent);
+    }
+
+    public function test_admin_and_staff_view_masked_profiling_pii_and_export_masked_pii(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
+        $staff = User::factory()->create(['role' => 'staff', 'is_approved' => true]);
+
+        $profile = KkProfile::create([
+            'surname' => 'Dela Cruz',
+            'first_name' => 'Juan',
+            'age' => 18,
+            'sex' => 'Male',
+            'dob' => '2008-11-22',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09998887777',
+            'email' => 'secret_citizen@example.com',
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => true,
+            'registered_disability' => 'SpecificSecretDisability',
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+
+        // Dashboard List View for Admin
+        $response = $this->actingAs($admin)->get('/dashboard/profiling');
+        $response->assertOk();
+        $response->assertDontSee('2008-11-22');
+        $response->assertDontSee('09998887777');
+        $response->assertDontSee('secret_citizen@example.com');
+        $response->assertDontSee('SpecificSecretDisability');
+        $response->assertDontSee('********');
+        $response->assertSee('-');
+
+        // CSV Export for Staff
+        $exportResponse = $this->actingAs($staff)->get('/dashboard/export/profiling');
+        $exportResponse->assertOk();
+        $exportContent = $exportResponse->streamedContent();
+        $this->assertStringNotContainsString('2008-11-22', $exportContent);
+        $this->assertStringNotContainsString('09998887777', $exportContent);
+        $this->assertStringNotContainsString('secret_citizen@example.com', $exportContent);
+        $this->assertStringNotContainsString('SpecificSecretDisability', $exportContent);
+        $this->assertStringNotContainsString('********', $exportContent);
+    }
+
+    public function test_admin_or_staff_can_update_profile_without_corrupting_masked_pii(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
+
+        $profile = KkProfile::create([
+            'surname' => 'Dela Cruz',
+            'first_name' => 'Juan',
+            'age' => 18,
+            'sex' => 'Male',
+            'dob' => '2008-01-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => 'juan@example.com',
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => true,
+            'registered_disability' => 'Visual Impairment',
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+
+        // Submit update payload with empty values (just like the frontend edit form sends now)
+        $payload = [
+            'surname' => 'Dela Cruz',
+            'first_name' => 'Juan Updated',
+            'age' => 18,
+            'sex' => 'Male',
+            'dob' => '', // Empty/Masked Date of Birth
+            'civil_status' => 'Married', // Updated field
+            'purok_id' => 1,
+            'youth_classification' => 'WY', // Updated field
+            'contact_number' => '', // Empty/Masked Contact
+            'email' => '', // Empty/Masked Email
+            'registered_sk_voter' => 1,
+            'registered_national_voter' => 0,
+            'attended_kk_assembly' => 1,
+            'part_of_youth_org' => 0,
+            'interested_in_joining' => 1,
+            'part_of_lgbtqia' => 0,
+            'pwd' => '', // Empty/Masked PWD
+            'registered_disability' => '', // Empty/Masked Disability
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => 1,
+        ];
+
+        $response = $this->actingAs($admin)->put("/dashboard/profiling/{$profile->id}", $payload);
+        $response->assertRedirect('/dashboard/profiling');
+
+        // Confirm database values are NOT corrupted/overwritten by empty request values
+        $this->assertDatabaseHas('kk_profiles', [
+            'id' => $profile->id,
+            'first_name' => 'Juan Updated',
+            'civil_status' => 'Married',
+            'youth_classification' => 'WY',
+            'dob' => '2008-01-20 00:00:00', // Maintained original DOB datetime
+            'contact_number' => '09171234567', // Maintained original Contact
+            'email' => 'juan@example.com', // Maintained original Email
+            'pwd' => 1, // Maintained original PWD
+            'registered_disability' => 'Visual Impairment', // Maintained original Disability
+        ]);
+    }
+
+    public function test_registration_requires_first_and_last_name_and_combines_them(): void
+    {
+        // 1. Submit incomplete registration
+        $response1 = $this->post('/register', [
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+        $response1->assertSessionHasErrors(['first_name', 'last_name']);
+
+        // 2. Submit complete registration
+        $response2 = $this->post('/register', [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'email' => 'newuser@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123',
+        ]);
+
+        $response2->assertRedirect('/login');
+        $this->assertDatabaseHas('users', [
+            'first_name' => 'Jane',
+            'last_name' => 'Doe',
+            'name' => 'Jane Doe',
+            'email' => 'newuser@example.com',
+        ]);
+    }
+
+    public function test_non_profiled_user_cannot_access_forms_and_gets_redirected(): void
+    {
+        $citizen = User::factory()->create(['role' => 'user', 'is_approved' => true]);
+
+        // Accessing sports registration should redirect
+        $response = $this->actingAs($citizen)->get('/forms/sports-registration');
+        $response->assertRedirect('/profile/my-requests');
+        $response->assertSessionHas('error');
+    }
+
+    public function test_profiled_user_can_access_forms_successfully(): void
+    {
+        $citizen = User::factory()->create(['role' => 'user', 'is_approved' => true]);
+
+        // Create KK profile matching citizen email
+        KkProfile::create([
+            'surname' => 'Doe',
+            'first_name' => 'John',
+            'age' => 20,
+            'sex' => 'Male',
+            'dob' => '2006-05-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => $citizen->email,
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => false,
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+
+        // Accessing sports registration should load successfully (loads the dedicated page successfully)
+        $response = $this->actingAs($citizen)->get('/forms/sports-registration');
+        $response->assertOk();
+    }
+
+    public function test_citizen_self_profiling_creates_pending_profile_and_cannot_access_forms_until_approved(): void
+    {
+        $citizen = User::factory()->create(['role' => 'user', 'is_approved' => true]);
+        $admin = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
+
+        // Submit self profiling
+        $this->actingAs($citizen)->post('/profile/profiling', [
+            'surname' => 'Doe',
+            'first_name' => 'John',
+            'age' => 20,
+            'sex' => 'Male',
+            'dob' => '2006-05-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => $citizen->email,
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => false,
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+
+        // Verify status is pending
+        $profile = KkProfile::where('email', $citizen->email)->first();
+        $this->assertNotNull($profile);
+        $this->assertEquals('pending', $profile->status);
+
+        // Cannot access sports registration (redirected back to my-requests with warning)
+        $response = $this->actingAs($citizen)->get('/forms/sports-registration');
+        $response->assertRedirect('/profile/my-requests');
+        $response->assertSessionHas('error', 'Your KK Profiling registry is currently pending review by our desk officers. All services will be unlocked once approved.');
+
+        // Approve profile as admin
+        $responseApprove = $this->actingAs($admin)->patch("/dashboard/profiling/{$profile->id}/approve");
+        $responseApprove->assertRedirect();
+        
+        $profile->refresh();
+        $this->assertEquals('approved', $profile->status);
+
+        // Citizen can now access forms successfully
+        $responseSuccess = $this->actingAs($citizen)->get('/forms/sports-registration');
+        $responseSuccess->assertOk();
+    }
+
+    public function test_citizen_can_resubmit_profiling_if_declined(): void
+    {
+        $citizen = User::factory()->create(['role' => 'user', 'is_approved' => true]);
+        $admin = User::factory()->create(['role' => 'admin', 'is_approved' => true]);
+
+        // Create initial pending profile
+        $profile = KkProfile::create([
+            'surname' => 'Doe',
+            'first_name' => 'John',
+            'age' => 20,
+            'sex' => 'Male',
+            'dob' => '2006-05-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => $citizen->email,
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => false,
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+            'status' => 'pending',
+        ]);
+
+        // Admin declines the profile
+        $responseDecline = $this->actingAs($admin)->patch("/dashboard/profiling/{$profile->id}/decline");
+        $responseDecline->assertRedirect();
+
+        $profile->refresh();
+        $this->assertEquals('declined', $profile->status);
+
+        // Citizen tries to access forms - blocked with declined warning
+        $responseBlock = $this->actingAs($citizen)->get('/forms/sports-registration');
+        $responseBlock->assertRedirect('/profile/my-requests');
+        $responseBlock->assertSessionHas('error', 'Your KK Profiling registry has been declined. Please re-submit your profiling details.');
+
+        // Citizen can view self-profiling form again
+        $responseForm = $this->actingAs($citizen)->get('/profile/profiling');
+        $responseForm->assertOk();
+
+        // Citizen resubmits
+        $responseResubmit = $this->actingAs($citizen)->post('/profile/profiling', [
+            'surname' => 'Doe-Updated',
+            'first_name' => 'John',
+            'age' => 20,
+            'sex' => 'Male',
+            'dob' => '2006-05-20',
+            'civil_status' => 'Single',
+            'purok_id' => 1,
+            'youth_classification' => 'ISY',
+            'contact_number' => '09171234567',
+            'email' => $citizen->email,
+            'registered_sk_voter' => true,
+            'registered_national_voter' => false,
+            'attended_kk_assembly' => true,
+            'part_of_youth_org' => false,
+            'interested_in_joining' => true,
+            'part_of_lgbtqia' => false,
+            'pwd' => false,
+            'highest_educational_attainment' => 'High School Student',
+            'consent_given' => true,
+        ]);
+        $responseResubmit->assertRedirect('/profile/my-requests');
+
+        // Assert old record was deleted and new record is pending
+        $this->assertDatabaseMissing('kk_profiles', ['id' => $profile->id]);
+        
+        $newProfile = KkProfile::where('email', $citizen->email)->first();
+        $this->assertNotNull($newProfile);
+        $this->assertEquals('pending', $newProfile->status);
+        $this->assertEquals('Doe-Updated', $newProfile->surname);
     }
 }
 

@@ -20,6 +20,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'first_name',
+        'last_name',
         'email',
         'password',
         'role',
@@ -96,5 +98,13 @@ class User extends Authenticatable
     public function canAccessDashboard(): bool
     {
         return in_array($this->role, ['superadmin', 'admin', 'staff', 'dpo']);
+    }
+
+    /**
+     * Get the notifications for the user.
+     */
+    public function notifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Notification::class)->latest();
     }
 }

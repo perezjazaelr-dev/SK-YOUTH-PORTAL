@@ -85,7 +85,7 @@
         this.age = profile.age;
         this.sex = profile.sex;
         this.gender = profile.gender || '';
-        this.dob = profile.dob ? profile.dob.substring(0, 10) : '';
+        this.dob = profile.dob ? (profile.dob.length > 10 ? profile.dob.substring(0, 10) : profile.dob) : '';
         this.civil_status = profile.civil_status;
         this.purok_id = profile.purok_id;
         this.street_address = profile.street_address || '';
@@ -99,7 +99,7 @@
         this.youth_org_name = profile.youth_org_name || '';
         this.interested_in_joining = profile.interested_in_joining ? '1' : '0';
         this.part_of_lgbtqia = profile.part_of_lgbtqia ? '1' : '0';
-        this.isPwd = profile.pwd ? '1' : '0';
+        this.isPwd = (profile.pwd === '' || profile.pwd === null) ? '' : (profile.pwd ? '1' : '0');
         this.registered_disability = profile.registered_disability || '';
         this.highest_educational_attainment = profile.highest_educational_attainment;
         this.consent_given = profile.consent_given ? true : false;
@@ -206,6 +206,45 @@
                 </div>
             @endif
 
+            <!-- Status Filter Tabs -->
+            <div class="flex items-center gap-3 border-b border-slate-100 pb-px mb-6 overflow-x-auto whitespace-nowrap">
+                <a href="{{ route('dashboard.profiling.index', array_merge(request()->query(), ['status' => 'approved'])) }}"
+                   class="pb-3 text-xs font-bold transition flex items-center gap-2 px-1 relative {{ $statusFilter === 'approved' ? 'text-[#1e40af]' : 'text-slate-550 hover:text-slate-800' }}">
+                    <span>Active Registry</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black {{ $statusFilter === 'approved' ? 'bg-blue-100 text-[#1e40af]' : 'bg-slate-100 text-slate-650' }}">{{ $approvedCount }}</span>
+                    @if($statusFilter === 'approved')
+                        <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e40af] rounded-full"></div>
+                    @endif
+                </a>
+                
+                <a href="{{ route('dashboard.profiling.index', array_merge(request()->query(), ['status' => 'pending'])) }}"
+                   class="pb-3 text-xs font-bold transition flex items-center gap-2 px-1 relative {{ $statusFilter === 'pending' ? 'text-[#1e40af]' : 'text-slate-550 hover:text-slate-800' }}">
+                    <span>Pending Review</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black {{ $pendingCount > 0 ? 'bg-rose-100 text-rose-750 animate-pulse' : ($statusFilter === 'pending' ? 'bg-blue-100 text-[#1e40af]' : 'bg-slate-100 text-slate-650') }}">{{ $pendingCount }}</span>
+                    @if($statusFilter === 'pending')
+                        <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e40af] rounded-full"></div>
+                    @endif
+                </a>
+
+                <a href="{{ route('dashboard.profiling.index', array_merge(request()->query(), ['status' => 'declined'])) }}"
+                   class="pb-3 text-xs font-bold transition flex items-center gap-2 px-1 relative {{ $statusFilter === 'declined' ? 'text-[#1e40af]' : 'text-slate-550 hover:text-slate-800' }}">
+                    <span>Declined</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black {{ $statusFilter === 'declined' ? 'bg-blue-100 text-[#1e40af]' : 'bg-slate-100 text-slate-650' }}">{{ $declinedCount }}</span>
+                    @if($statusFilter === 'declined')
+                        <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e40af] rounded-full"></div>
+                    @endif
+                </a>
+
+                <a href="{{ route('dashboard.profiling.index', array_merge(request()->query(), ['status' => 'all'])) }}"
+                   class="pb-3 text-xs font-bold transition flex items-center gap-2 px-1 relative {{ $statusFilter === 'all' ? 'text-[#1e40af]' : 'text-slate-550 hover:text-slate-800' }}">
+                    <span>All Records</span>
+                    <span class="px-2 py-0.5 rounded-full text-[9px] font-black {{ $statusFilter === 'all' ? 'bg-blue-100 text-[#1e40af]' : 'bg-slate-100 text-slate-650' }}">{{ $approvedCount + $pendingCount + $declinedCount }}</span>
+                    @if($statusFilter === 'all')
+                        <div class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1e40af] rounded-full"></div>
+                    @endif
+                </a>
+            </div>
+
             <!-- Search Bar & Filters Card -->
             <div class="card p-6 bg-white border border-slate-100 rounded-3xl shadow-sm"
                  x-data="{ 
@@ -221,9 +260,10 @@
                      }
                  }">
                 <form id="filterForm" x-ref="filterForm" method="GET" action="{{ route('dashboard.profiling.index') }}" class="space-y-4">
-                    <!-- Hidden filters for LGBTQIA / PWD toggles -->
+                    <!-- Hidden filters for LGBTQIA / PWD toggles & status tab -->
                     <input type="hidden" name="lgbtqia" :value="lgbt">
                     <input type="hidden" name="pwd" :value="pwd">
+                    <input type="hidden" name="status" value="{{ $statusFilter }}">
 
                     <!-- Row 1: Search, Purok, Year -->
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -333,6 +373,7 @@
                             </div>
 
                             <!-- LGBTQIA Toggle Badge -->
+                            @if(auth()->user()->isSuperAdmin())
                             <button type="button" @click="toggleLgbt()" 
                                     :class="lgbt === '1' ? 'bg-blue-50 border-blue-200 text-[#1e40af] font-black' : 'bg-slate-50 border-slate-100 text-slate-600 hover:bg-slate-100'"
                                     class="px-3.5 py-2 border rounded-2xl text-[11px] font-bold tracking-wide transition active:scale-95 cursor-pointer flex items-center space-x-1.5 select-none"
@@ -347,6 +388,7 @@
                             >
                                 <span>Health Info (PWD)</span>
                             </button>
+                            @endif
 
                             <!-- Reset Filter Link -->
                             @if($search || $purokFilter || $classFilter || $yearFilter || $sexFilter || $skVoterFilter || $nationalVoterFilter || $lgbtqiaFilter || $pwdFilter || $limit != 15)
@@ -407,6 +449,7 @@
                                     <th class="py-4 px-6">Purok</th>
                                     <th class="py-4 px-6">Street Address</th>
                                     <th class="py-4 px-6">Processed By</th>
+                                    <th class="py-4 px-6">Status</th>
                                     <th class="py-4 px-6 text-center">Actions</th>
                                 </tr>
                             </thead>
@@ -424,19 +467,37 @@
                                         <td class="py-4 px-6 text-center font-bold text-slate-700">{{ $profile->age }}</td>
                                         <td class="py-4 px-6">{{ $profile->sex }}</td>
                                         <td class="py-4 px-6 text-slate-500">{{ $profile->gender ?? '-' }}</td>
-                                        <td class="py-4 px-6 font-mono">{{ \Carbon\Carbon::parse($profile->dob)->format('M d, Y') }}</td>
+                                        <td class="py-4 px-6 font-mono">
+                                            @if(auth()->user()->isSuperAdmin())
+                                                {{ \Carbon\Carbon::parse($profile->dob)->format('M d, Y') }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         <td class="py-4 px-6">{{ $profile->civil_status }}</td>
                                         <td class="py-4 px-6">
                                             @if($profile->youth_classification === 'ISY')
                                                 <span class="px-2 py-0.5 bg-blue-50 text-blue-800 border border-blue-200 rounded-full text-[9px] font-black uppercase tracking-wide">In-School (ISY)</span>
                                             @elseif($profile->youth_classification === 'OSY')
-                                                <span class="px-2 py-0.5 bg-rose-50 text-rose-800 border border-rose-200 rounded-full text-[9px] font-black uppercase tracking-wide">Out-of-School (OSY)</span>
+                                                <span class="px-2 py-0.5 bg-rose-50 text-rose-800 border border-rose-250 rounded-full text-[9px] font-black uppercase tracking-wide">Out-of-School (OSY)</span>
                                             @else
                                                 <span class="px-2 py-0.5 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-[9px] font-black uppercase tracking-wide">Working (WY)</span>
                                             @endif
                                         </td>
-                                        <td class="py-4 px-6 font-medium text-slate-700">{{ $profile->contact_number }}</td>
-                                        <td class="py-4 px-6 font-mono text-slate-500">{{ $profile->email }}</td>
+                                        <td class="py-4 px-6 font-medium text-slate-700">
+                                            @if(auth()->user()->isSuperAdmin())
+                                                {{ $profile->contact_number }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="py-4 px-6 font-mono text-slate-500">
+                                            @if(auth()->user()->isSuperAdmin())
+                                                {{ $profile->email }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
                                         
                                         <!-- Registered SK Voter -->
                                         <td class="py-4 px-6 text-center">
@@ -469,7 +530,7 @@
                                         <td class="py-4 px-6">
                                             @if($profile->part_of_youth_org)
                                                 <span class="font-bold text-slate-800">Yes</span>
-                                                <span class="text-slate-450 block text-[9px] mt-0.5">{{ $profile->youth_org_name }}</span>
+                                                <span class="text-slate-455 block text-[9px] mt-0.5">{{ $profile->youth_org_name }}</span>
                                             @else
                                                 <span class="text-slate-400 italic">No</span>
                                             @endif
@@ -499,11 +560,15 @@
 
                                         <!-- PWD Disability -->
                                         <td class="py-4 px-6">
-                                            @if($profile->pwd)
-                                                <span class="font-bold text-rose-700">Yes</span>
-                                                <span class="text-slate-455 block text-[9px] mt-0.5">{{ $profile->registered_disability }}</span>
+                                            @if(auth()->user()->isSuperAdmin())
+                                                @if($profile->pwd)
+                                                    <span class="font-bold text-rose-700">Yes</span>
+                                                    <span class="text-slate-455 block text-[9px] mt-0.5">{{ $profile->registered_disability }}</span>
+                                                @else
+                                                    <span class="text-slate-400 italic">No</span>
+                                                @endif
                                             @else
-                                                <span class="text-slate-400 italic">No</span>
+                                                -
                                             @endif
                                         </td>
 
@@ -529,16 +594,46 @@
                                             @endif
                                         </td>
 
+                                        <!-- Status -->
+                                        <td class="py-4 px-6">
+                                            @if($profile->status === 'approved')
+                                                <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Approved</span>
+                                            @elseif($profile->status === 'pending')
+                                                <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Pending Review</span>
+                                            @else
+                                                <span class="px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Declined</span>
+                                            @endif
+                                        </td>
+
                                         <!-- Actions -->
                                         <td class="py-4 px-6 text-center whitespace-nowrap">
                                             <div class="flex items-center justify-center space-x-2">
+                                                <!-- Approve/Decline Buttons for Pending citizens -->
+                                                @if($profile->status === 'pending')
+                                                    <form action="{{ route('dashboard.profiling.approve', $profile) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="p-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg hover:bg-emerald-600 hover:text-white transition active:scale-95" title="Approve Profile">
+                                                            <svg class="w-4 h-4 text-emerald-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                                        </button>
+                                                    </form>
+
+                                                    <form action="{{ route('dashboard.profiling.decline', $profile) }}" method="POST" class="inline">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="p-1.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg hover:bg-rose-600 hover:text-white transition active:scale-95" title="Decline Profile">
+                                                            <svg class="w-4 h-4 text-rose-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                        </button>
+                                                    </form>
+                                                @endif
+
                                                 <!-- View Button -->
-                                                <button type="button" @click="openView({{ json_encode($profile) }}, '{{ $profile->purok->purok_name }}')" class="p-1.5 bg-blue-50 text-[#1e40af] border border-blue-100 rounded-lg hover:bg-[#1e40af] hover:text-white transition active:scale-95" title="View Profile">
+                                                <button type="button" @click="openView({{ json_encode($profile->toPresentableArray(auth()->user())) }}, '{{ $profile->purok->purok_name }}')" class="p-1.5 bg-blue-50 text-[#1e40af] border border-blue-100 rounded-lg hover:bg-[#1e40af] hover:text-white transition active:scale-95" title="View Profile">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                                 </button>
 
                                                 <!-- Edit Button -->
-                                                <button type="button" @click="openEdit({{ json_encode($profile) }})" class="p-1.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg hover:bg-amber-600 hover:text-white transition active:scale-95" title="Edit Profile">
+                                                <button type="button" @click="openEdit({{ json_encode($profile->toPresentableArray(auth()->user())) }})" class="p-1.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg hover:bg-amber-600 hover:text-white transition active:scale-95" title="Edit Profile">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                                                 </button>
 
@@ -757,7 +852,10 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Date of Birth <span class="text-rose-500">*</span></label>
-                            <input type="date" name="dob" x-model="dob" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl">
+                            <input :type="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }} ? 'text' : 'date'" name="dob" x-model="dob" required
+                                   :readonly="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                                   class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl"
+                                   :class="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }} ? 'bg-slate-100/80 cursor-not-allowed opacity-75' : ''">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Civil Status <span class="text-rose-500">*</span></label>
@@ -802,11 +900,19 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Contact Number <span class="text-rose-500">*</span></label>
-                            <input type="text" name="contact_number" x-model="contact_number" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. 09171234567">
+                            <input type="text" name="contact_number" x-model="contact_number" required
+                                   :readonly="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                                   class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl"
+                                   :class="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }} ? 'bg-slate-100/80 cursor-not-allowed opacity-75' : ''"
+                                   placeholder="e.g. 09171234567">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Email Address <span class="text-rose-500">*</span></label>
-                            <input type="email" name="email" x-model="email" required class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. citizen@namayan.local">
+                            <input type="email" name="email" x-model="email" required
+                                   :readonly="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                                   class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl"
+                                   :class="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }} ? 'bg-slate-100/80 cursor-not-allowed opacity-75' : ''"
+                                   placeholder="e.g. citizen@namayan.local">
                         </div>
                     </div>
                 </div>
@@ -923,22 +1029,31 @@
                         <div class="space-y-2">
                             <span class="block font-bold text-slate-500 uppercase text-[10px]">Person with Disability (PWD)? <span class="text-rose-500">*</span></span>
                             <div class="flex items-center space-x-4">
-                                <label class="inline-flex items-center">
-                                    <input type="radio" name="pwd" value="1" x-model="isPwd" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <label class="inline-flex items-center" x-show="isPwd !== ''">
+                                    <input type="radio" name="pwd" value="1" x-model="isPwd" required
+                                           :disabled="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                                           class="text-[#1e40af] focus:ring-[#1e40af]">
                                     <span class="ml-2">Yes</span>
                                 </label>
-                                <label class="inline-flex items-center">
-                                    <input type="radio" name="pwd" value="0" x-model="isPwd" required class="text-[#1e40af] focus:ring-[#1e40af]">
+                                <label class="inline-flex items-center" x-show="isPwd !== ''">
+                                    <input type="radio" name="pwd" value="0" x-model="isPwd" required
+                                           :disabled="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                                           class="text-[#1e40af] focus:ring-[#1e40af]">
                                     <span class="ml-2">No</span>
                                 </label>
+                                <span x-show="isPwd === ''" class="text-slate-450 italic font-semibold">-</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Disability Name (Conditional if Yes) -->
-                    <div x-show="isPwd === '1'" x-transition class="space-y-2">
+                    <div x-show="isPwd === '1' || isPwd === ''" x-transition class="space-y-2">
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Registered Disability <span class="text-rose-500">*</span></label>
-                        <input type="text" name="registered_disability" x-model="registered_disability" :required="isPwd === '1'" class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl" placeholder="e.g. Visual Impairment">
+                        <input type="text" name="registered_disability" x-model="registered_disability" :required="isPwd === '1'"
+                               :readonly="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }}"
+                               class="field focus:ring-4 focus:ring-blue-600/10 text-xs py-2 bg-slate-50/50 border border-slate-200 rounded-xl"
+                               :class="editMode && !{{ auth()->user()->isSuperAdmin() ? 'true' : 'false' }} ? 'bg-slate-100/80 cursor-not-allowed opacity-75' : ''"
+                               placeholder="e.g. Visual Impairment">
                     </div>
 
                     <!-- Highest Educational Attainment -->
@@ -1022,7 +1137,7 @@
                             <span class="text-base font-black text-slate-800" x-text="(selectedProfile.first_name || '') + ' ' + (selectedProfile.middle_name ? selectedProfile.middle_name + ' ' : '') + (selectedProfile.surname || '') + (selectedProfile.ext ? ' ' + selectedProfile.ext : '')"></span>
                             <span class="px-2.5 py-0.5 bg-blue-50 text-[#1e40af] border border-blue-150 rounded-full text-[9px] font-black uppercase tracking-wider" x-text="selectedProfile.youth_classification"></span>
                         </div>
-                        <p class="text-[10px] text-slate-400 font-mono" x-text="selectedProfile.email"></p>
+                        <p class="text-[10px] text-slate-400 font-mono" x-text="selectedProfile.email || '-'"></p>
                     </div>
                     <div class="flex items-center space-x-3 shrink-0">
                         <div class="text-center bg-white border border-slate-100 rounded-xl px-3 py-1.5 shadow-sm">
@@ -1054,7 +1169,7 @@
                         </div>
                         <div>
                             <span class="block text-[10px] text-slate-400 font-bold uppercase text-[9px] text-slate-400 mb-0.5">Contact Number</span>
-                            <span class="font-semibold text-slate-700 text-[11px]" x-text="selectedProfile.contact_number"></span>
+                            <span class="font-semibold text-slate-700 text-[11px]" x-text="selectedProfile.contact_number || '-'"></span>
                         </div>
                         <div>
                             <span class="block text-[10px] text-slate-400 font-bold uppercase text-[9px] text-slate-400 mb-0.5">Purok</span>
@@ -1131,14 +1246,17 @@
                         </div>
                         <div>
                             <span class="block text-[10px] text-slate-400 font-bold uppercase text-[9px] text-slate-400 mb-1">Person with Disability (PWD)?</span>
-                            <template x-if="selectedProfile.pwd == 1">
+                            <template x-if="selectedProfile.pwd === 1 || selectedProfile.pwd === '1' || selectedProfile.pwd === true">
                                 <div>
                                     <span class="px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-250 rounded-full text-[9px] font-black uppercase tracking-wide">Yes</span>
-                                    <span class="text-slate-450 block text-[9px] mt-1" x-text="'Registered Disability: ' + (selectedProfile.registered_disability || 'None')"></span>
+                                    <span class="text-slate-455 block text-[9px] mt-1" x-text="'Registered Disability: ' + (selectedProfile.registered_disability || 'None')"></span>
                                 </div>
                             </template>
-                            <template x-if="selectedProfile.pwd != 1">
+                            <template x-if="selectedProfile.pwd === 0 || selectedProfile.pwd === '0' || selectedProfile.pwd === false">
                                 <span class="px-2 py-0.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-full text-[9px] font-bold uppercase tracking-wide">No</span>
+                            </template>
+                            <template x-if="selectedProfile.pwd === '' || selectedProfile.pwd === null">
+                                <span class="text-slate-400 italic">-</span>
                             </template>
                         </div>
                         <div>

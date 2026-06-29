@@ -37,10 +37,10 @@
         </div>
     </div>
 @else
-    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 flex-1 space-y-8">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-1 font-sans space-y-8">
         <div>
-            <span class="text-xs font-black tracking-widest text-[#1e40af] uppercase font-display block">Settings Portal</span>
-            <h1 class="text-3xl font-black tracking-tight text-slate-800 font-display mt-1.5 uppercase">Edit Account Profile</h1>
+            <span class="text-[10px] font-black tracking-widest text-[#1e40af] uppercase font-display block">Settings Portal</span>
+            <h1 class="text-2xl font-black tracking-tight text-slate-800 font-display uppercase mt-1">Edit Account Profile</h1>
             <p class="text-xs text-slate-400 mt-1">Manage your basic contact info, change security credentials, or delete your account records.</p>
         </div>
 

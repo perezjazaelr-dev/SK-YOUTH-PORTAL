@@ -129,7 +129,8 @@ class ExportController extends Controller
                         'Interested in Joining', 'LGBTQIA+', 'PWD', 'Registered Disability', 
                         'Highest Educational Attainment', 'Processed By', 'Date Registered'
                     ]);
-                    KkProfile::with(['purok', 'processedBy'])->chunk(100, function ($records) use ($handle) {
+                    $isSuperAdmin = auth()->user()->isSuperAdmin();
+                    KkProfile::with(['purok', 'processedBy'])->chunk(100, function ($records) use ($handle, $isSuperAdmin) {
                         foreach ($records as $record) {
                             fputcsv($handle, [
                                 $record->id,
@@ -140,13 +141,13 @@ class ExportController extends Controller
                                 $record->age,
                                 $record->sex,
                                 $record->gender,
-                                $record->dob ? $record->dob->format('Y-m-d') : '',
+                                $isSuperAdmin ? ($record->dob ? $record->dob->format('Y-m-d') : '') : '',
                                 $record->civil_status,
                                 $record->purok ? $record->purok->purok_name : '',
                                 $record->street_address,
                                 $record->youth_classification,
-                                $record->contact_number,
-                                $record->email,
+                                $isSuperAdmin ? $record->contact_number : '',
+                                $isSuperAdmin ? $record->email : '',
                                 $record->registered_sk_voter ? 'Yes' : 'No',
                                 $record->registered_national_voter ? 'Yes' : 'No',
                                 $record->attended_kk_assembly ? 'Yes' : 'No',
@@ -154,8 +155,8 @@ class ExportController extends Controller
                                 $record->youth_org_name,
                                 $record->interested_in_joining ? 'Yes' : 'No',
                                 $record->part_of_lgbtqia ? 'Yes' : 'No',
-                                $record->pwd ? 'Yes' : 'No',
-                                $record->registered_disability,
+                                $isSuperAdmin ? ($record->pwd ? 'Yes' : 'No') : '',
+                                $isSuperAdmin ? $record->registered_disability : '',
                                 $record->highest_educational_attainment,
                                 $record->processedBy ? ($record->processedBy->role === 'user' ? 'Self Profiling' : $record->processedBy->name) : 'Self Profiling',
                                 $record->created_at->format('Y-m-d H:i:s'),

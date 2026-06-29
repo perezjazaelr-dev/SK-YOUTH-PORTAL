@@ -7,6 +7,8 @@ use App\Models\Purok;
 use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use App\Models\Notification;
+use App\Models\User;
 
 class KkProfileController extends Controller
 {
@@ -80,6 +82,19 @@ class KkProfileController extends Controller
             $query->where('pwd', (bool) $pwdFilter);
         }
 
+        $statusFilter = $request->input('status', 'all');
+        if (!in_array($statusFilter, ['approved', 'pending', 'declined', 'all'])) {
+            $statusFilter = 'all';
+        }
+
+        $approvedCount = KkProfile::where('status', 'approved')->count();
+        $pendingCount = KkProfile::where('status', 'pending')->count();
+        $declinedCount = KkProfile::where('status', 'declined')->count();
+
+        if ($statusFilter !== 'all') {
+            $query->where('status', $statusFilter);
+        }
+
         $profiles = $query->paginate($limit)->withQueryString();
         $puroks = Purok::orderBy('purok_name')->get();
 
@@ -114,7 +129,8 @@ class KkProfileController extends Controller
         return view('dashboard.profiling.index', compact(
             'profiles', 'puroks', 'search', 'purokFilter', 'classFilter',
             'yearFilter', 'sexFilter', 'skVoterFilter', 'nationalVoterFilter',
-            'lgbtqiaFilter', 'pwdFilter', 'limit', 'years', 'historyLogs'
+            'lgbtqiaFilter', 'pwdFilter', 'limit', 'years', 'historyLogs',
+            'statusFilter', 'approvedCount', 'pendingCount', 'declinedCount'
         ));
     }
 
@@ -177,7 +193,7 @@ class KkProfileController extends Controller
     {
         // Check if citizen has already completed profiling
         $existingProfile = KkProfile::where('email', auth()->user()->email)->first();
-        if ($existingProfile) {
+        if ($existingProfile && $existingProfile->status !== 'declined') {
             return redirect()->route('profile.my-requests')
                 ->with('info', 'Your Katipunan ng Kabataan profile is already registered.');
         }
@@ -196,8 +212,12 @@ class KkProfileController extends Controller
         // Check if citizen has already completed profiling
         $existingProfile = KkProfile::where('email', auth()->user()->email)->first();
         if ($existingProfile) {
-            return redirect()->route('profile.my-requests')
-                ->with('info', 'Your Katipunan ng Kabataan profile is already registered.');
+            if ($existingProfile->status === 'declined') {
+                $existingProfile->delete();
+            } else {
+                return redirect()->route('profile.my-requests')
+                    ->with('info', 'Your Katipunan ng Kabataan profile is already registered.');
+            }
         }
 
         $validated = $request->validate([
@@ -237,7 +257,8 @@ class KkProfileController extends Controller
         $validated['email'] = auth()->user()->email;
 
         $profile = KkProfile::create(array_merge($validated, [
-            'processed_by' => auth()->id()
+            'processed_by' => auth()->id(),
+            'status' => 'pending'
         ]));
 
         // Record Activity Log
@@ -256,6 +277,26 @@ class KkProfileController extends Controller
      */
     public function update(Request $request, KkProfile $profile)
     {
+        $data = $request->all();
+
+        if (empty($data['dob'])) {
+            $data['dob'] = $profile->dob ? $profile->dob->format('Y-m-d') : null;
+        }
+        if (empty($data['contact_number'])) {
+            $data['contact_number'] = $profile->contact_number;
+        }
+        if (empty($data['email'])) {
+            $data['email'] = $profile->email;
+        }
+        if ($data['pwd'] === '' || $data['pwd'] === null) {
+            $data['pwd'] = $profile->pwd ? 1 : 0;
+            if (empty($data['registered_disability'])) {
+                $data['registered_disability'] = $profile->registered_disability;
+            }
+        }
+
+        $request->merge($data);
+
         $validated = $request->validate([
             // Step 1: Personal Details
             'surname' => ['required', 'string', 'max:255'],
@@ -301,6 +342,60 @@ class KkProfileController extends Controller
 
         return redirect()->route('dashboard.profiling.index')
             ->with('success', 'Katipunan ng Kabataan profile has been successfully updated.');
+    }
+
+    /**
+     * Approve a pending KK Profile.
+     */
+    public function approve(KkProfile $profile)
+    {
+        $profile->update(['status' => 'approved']);
+
+        ActivityLog::record('kk_profile_updated', $profile, [
+            'name' => $profile->full_name,
+            'email' => $profile->email,
+            'status' => 'approved',
+        ]);
+
+        // Notify user
+        $user = User::where('email', $profile->email)->first();
+        if ($user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => 'KK Profile Approved',
+                'message' => 'Your Katipunan ng Kabataan profile registry has been approved. All service requests are now unlocked.',
+                'url' => route('profile.my-requests')
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Katipunan ng Kabataan profile has been successfully approved.');
+    }
+
+    /**
+     * Decline a pending KK Profile.
+     */
+    public function decline(KkProfile $profile)
+    {
+        $profile->update(['status' => 'declined']);
+
+        ActivityLog::record('kk_profile_updated', $profile, [
+            'name' => $profile->full_name,
+            'email' => $profile->email,
+            'status' => 'declined',
+        ]);
+
+        // Notify user
+        $user = User::where('email', $profile->email)->first();
+        if ($user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => 'KK Profile Declined',
+                'message' => 'Your Katipunan ng Kabataan profile registry has been declined. Please re-submit your details.',
+                'url' => route('profile.my-requests')
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Katipunan ng Kabataan profile has been successfully declined.');
     }
 
     /**

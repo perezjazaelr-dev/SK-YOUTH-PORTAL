@@ -12,9 +12,9 @@ class SportsRegistrationController extends Controller
     /**
      * Show sports registration form.
      */
-    public function create(): RedirectResponse
+    public function create(): View
     {
-        return redirect()->route('landing', ['form' => 'sports']);
+        return view('forms.sports-registration');
     }
 
     /**

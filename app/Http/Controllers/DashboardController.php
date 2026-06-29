@@ -15,6 +15,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
+use App\Models\Notification;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -281,6 +283,17 @@ class DashboardController extends Controller
             $rawRequestModel->status = 'review';
             $rawRequestModel->save();
 
+            // Notify user
+            $user = User::where('email', $rawRequestModel->email)->first();
+            if ($user) {
+                Notification::create([
+                    'user_id' => $user->id,
+                    'title' => 'Request Under Review',
+                    'message' => 'Your ' . $this->resolveTypeName($type) . ' request is now under review.',
+                    'url' => route('profile.my-requests')
+                ]);
+            }
+
             // Fire status email silently on success
             try {
                 Mail::to($rawRequestModel->email)->send(new StatusChangedMail($rawRequestModel));
@@ -345,6 +358,17 @@ class DashboardController extends Controller
             $requestModel->processed_by = null;
         }
         $requestModel->save();
+
+        // Notify user
+        $user = User::where('email', $requestModel->email)->first();
+        if ($user) {
+            Notification::create([
+                'user_id' => $user->id,
+                'title' => 'Request Status: ' . ucfirst($status),
+                'message' => 'Your ' . $this->resolveTypeName($type) . ' request status has been updated to ' . ucfirst($status) . '.',
+                'url' => route('profile.my-requests')
+            ]);
+        }
 
         // Fire status email silently on success
         try {

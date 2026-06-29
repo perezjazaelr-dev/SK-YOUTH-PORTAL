@@ -75,10 +75,10 @@ class ProfileController extends Controller
         $approved = $results->where('status', 'approved')->count();
         $declined = $results->where('status', 'declined')->count();
 
-        // Check if KK Profile exists
-        $hasProfile = \App\Models\KkProfile::where('email', $email)->exists();
+        // Get KK Profile
+        $profile = \App\Models\KkProfile::where('email', $email)->first();
 
-        return view('profile.my-requests', compact('results', 'total', 'pending', 'approved', 'declined', 'hasProfile'));
+        return view('profile.my-requests', compact('results', 'total', 'pending', 'approved', 'declined', 'profile'));
     }
 
     /**
@@ -99,11 +99,14 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email,' . $user->id],
         ]);
 
-        $user->name = $request->input('name');
+        $user->first_name = $request->input('first_name');
+        $user->last_name = $request->input('last_name');
+        $user->name = $request->input('first_name') . ' ' . $request->input('last_name');
         $user->email = $request->input('email');
 
         if ($user->isDirty('email')) {

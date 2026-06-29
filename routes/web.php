@@ -23,6 +23,7 @@ use App\Http\Controllers\SilidKarununganController;
 use App\Http\Controllers\SportsRegistrationController;
 use App\Http\Controllers\TrackRequestController;
 use App\Http\Controllers\KkProfileController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 // Public Landing Page & Static routes
@@ -68,8 +69,10 @@ Route::middleware(['auth', 'throttle:forms'])->group(function () {
     Route::get('/forms/silid-karunungan', [SilidKarununganController::class, 'create'])->name('forms.silid.create');
     Route::post('/forms/silid-karunungan', [SilidKarununganController::class, 'store'])->name('forms.silid.store');
 
-    Route::get('/forms/sports-registration', [SportsRegistrationController::class, 'create'])->name('forms.sports.create');
-    Route::post('/forms/sports-registration', [SportsRegistrationController::class, 'store'])->name('forms.sports.store');
+    Route::middleware('kk.profile.completed')->group(function () {
+        Route::get('/forms/sports-registration', [SportsRegistrationController::class, 'create'])->name('forms.sports.create');
+        Route::post('/forms/sports-registration', [SportsRegistrationController::class, 'store'])->name('forms.sports.store');
+    });
 });
 
 // Authenticated User Profile Routes
@@ -83,6 +86,10 @@ Route::middleware('auth')->group(function () {
     // Citizen Self-Profiling
     Route::get('/profile/profiling', [KkProfileController::class, 'selfCreate'])->name('profile.profiling.create');
     Route::post('/profile/profiling', [KkProfileController::class, 'selfStore'])->name('profile.profiling.store');
+
+    // Notifications
+    Route::patch('/notifications/{notification}/read', [NotificationController::class, 'read'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
 });
 
 // Dashboard (Middleware: auth, admin.staff)
@@ -101,6 +108,8 @@ Route::middleware(['auth', 'admin.staff'])->group(function () {
     Route::post('/dashboard/profiling', [KkProfileController::class, 'store'])->name('dashboard.profiling.store');
     Route::put('/dashboard/profiling/{profile}', [KkProfileController::class, 'update'])->name('dashboard.profiling.update');
     Route::delete('/dashboard/profiling/{profile}', [KkProfileController::class, 'destroy'])->name('dashboard.profiling.destroy');
+    Route::patch('/dashboard/profiling/{profile}/approve', [KkProfileController::class, 'approve'])->name('dashboard.profiling.approve');
+    Route::patch('/dashboard/profiling/{profile}/decline', [KkProfileController::class, 'decline'])->name('dashboard.profiling.decline');
 });
 
 // Admin and Superadmin Actions (Middleware: auth, admin.dpo)

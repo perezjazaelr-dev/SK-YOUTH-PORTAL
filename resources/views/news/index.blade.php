@@ -8,11 +8,11 @@
             <nav aria-label="Breadcrumb" class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-5 min-w-0">
                 <a href="{{ route('landing') }}" class="hover:text-white active:scale-95 shrink-0">Home</a>
                 <span aria-hidden="true" class="shrink-0">/</span>
-                <span class="text-white truncate" aria-current="page">News</span>
+                <span class="text-white truncate" aria-current="page">Community Board</span>
             </nav>
             <div class="max-w-2xl space-y-2.5">
                 <span class="inline-flex px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-[9px] font-black uppercase tracking-widest">Latest Updates</span>
-                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display uppercase tracking-tight leading-tight">News Articles</h1>
+                <h1 class="text-2xl sm:text-3xl md:text-4xl font-black font-display uppercase tracking-tight leading-tight">Community Board</h1>
                 <p class="text-sm text-slate-300 leading-relaxed">Stay connected with the latest announcements, activities, and stories from SK Namayan.</p>
             </div>
             <a href="{{ route('officials.index') }}" class="inline-flex items-center min-h-11 mt-6 px-5 bg-white/10 hover:bg-white/20 border border-white/20 font-bold text-xs uppercase tracking-wider rounded-2xl active:scale-95 transition-all">

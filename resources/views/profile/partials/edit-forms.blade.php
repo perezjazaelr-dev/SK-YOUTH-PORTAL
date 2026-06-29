@@ -9,7 +9,10 @@
             @csrf
             @method('PATCH')
 
-            <x-form-input label="Full Name" name="name" :value="$user->name" required="true" />
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <x-form-input label="First Name" name="first_name" :value="$user->first_name" required="true" />
+                <x-form-input label="Last Name" name="last_name" :value="$user->last_name" required="true" />
+            </div>
             <x-form-input label="Email Address" name="email" :value="$user->email" type="email" required="true" />
 
             <div class="flex justify-end pt-2">

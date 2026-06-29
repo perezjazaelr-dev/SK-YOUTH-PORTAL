@@ -7,13 +7,22 @@
     <form method="POST" action="{{ route('register') }}" class="space-y-4 pt-2" x-data="{ showPassword: false }">
         @csrf
 
-        <!-- Name -->
-        <div>
-            <label for="name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Full Name</label>
-            <input id="name" type="text" name="name" value="{{ old('name') }}" required autofocus autocomplete="name" class="field focus:ring-4 focus:ring-blue-600/10" placeholder="e.g. Neil Osorio">
-            @error('name')
-                <span class="text-rose-600 text-xs font-semibold mt-1 block">{{ $message }}</span>
-            @enderror
+        <!-- First & Last Name -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label for="first_name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">First Name</label>
+                <input id="first_name" type="text" name="first_name" value="{{ old('first_name') }}" required autofocus autocomplete="given-name" class="field focus:ring-4 focus:ring-blue-600/10" placeholder="e.g. Neil">
+                @error('first_name')
+                    <span class="text-rose-600 text-xs font-semibold mt-1 block">{{ $message }}</span>
+                @enderror
+            </div>
+            <div>
+                <label for="last_name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Last Name</label>
+                <input id="last_name" type="text" name="last_name" value="{{ old('last_name') }}" required autocomplete="family-name" class="field focus:ring-4 focus:ring-blue-600/10" placeholder="e.g. Osorio">
+                @error('last_name')
+                    <span class="text-rose-600 text-xs font-semibold mt-1 block">{{ $message }}</span>
+                @enderror
+            </div>
         </div>
 
         <!-- Email Address -->

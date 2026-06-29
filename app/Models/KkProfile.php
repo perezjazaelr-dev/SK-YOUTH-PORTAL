@@ -36,6 +36,7 @@ class KkProfile extends Model
         'highest_educational_attainment',
         'consent_given',
         'processed_by',
+        'status',
     ];
 
     protected function casts(): array
@@ -82,5 +83,26 @@ class KkProfile extends Model
             $fullName .= " {$this->ext}";
         }
         return $fullName;
+    }
+
+    /**
+     * Get profile representation suitable for presentation to a given user.
+     */
+    public function toPresentableArray(User $user): array
+    {
+        $data = $this->toArray();
+        $data['purokName'] = $this->purok ? $this->purok->purok_name : '';
+
+        if (!$user->isSuperAdmin()) {
+            $data['dob'] = '';
+            $data['contact_number'] = '';
+            $data['email'] = '';
+            $data['registered_disability'] = '';
+            $data['pwd'] = '';
+        } else {
+            $data['dob'] = $this->dob ? $this->dob->format('Y-m-d') : null;
+        }
+
+        return $data;
     }
 }

@@ -13,7 +13,8 @@ class UserApprovalTest extends TestCase
     public function test_newly_registered_users_start_unapproved_and_cannot_login(): void
     {
         $response = $this->post('/register', [
-            'name' => 'John Citizen',
+            'first_name' => 'John',
+            'last_name' => 'Citizen',
             'email' => 'john@namayan.local',
             'password' => 'Citizen@12345!',
             'password_confirmation' => 'Citizen@12345!',
