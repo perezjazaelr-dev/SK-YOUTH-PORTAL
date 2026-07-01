@@ -7,7 +7,7 @@
     </div>
     <div class="space-y-2">
         <h1 class="text-3xl font-black font-display text-slate-800 uppercase tracking-tight">Access Denied</h1>
-        <p class="text-xs text-slate-400">You do not have the necessary administrative permissions to view this secure resource.</p>
+        <p class="text-xs text-slate-400">{{ $exception->getMessage() ?: 'You do not have the necessary administrative permissions to view this secure resource.' }}</p>
     </div>
     <div class="flex items-center justify-center gap-3 pt-2">
         <a href="/" class="btn-primary">Back to Home</a>

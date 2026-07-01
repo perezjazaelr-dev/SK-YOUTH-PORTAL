@@ -6,6 +6,7 @@ use App\Models\HealthRequest;
 use App\Models\MedicineRequest;
 use App\Models\SilidKarununganRequest;
 use App\Models\SportsRegistration;
+use App\Models\CustomRequest;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -32,6 +33,7 @@ class TrackRequestController extends Controller
                 $medicine = MedicineRequest::where('email', $searchQuery)->get();
                 $silid = SilidKarununganRequest::where('email', $searchQuery)->get();
                 $sports = SportsRegistration::where('email', $searchQuery)->get();
+                $custom = CustomRequest::where('email', $searchQuery)->get();
             } elseif ($isRef) {
                 $prefix = strtoupper($matches[1]);
                 $id = intval($matches[2]);
@@ -40,11 +42,13 @@ class TrackRequestController extends Controller
                 $medicine = $prefix === 'MED' ? MedicineRequest::where('id', $id)->get() : collect();
                 $silid = $prefix === 'SIL' ? SilidKarununganRequest::where('id', $id)->get() : collect();
                 $sports = $prefix === 'SPO' ? SportsRegistration::where('id', $id)->get() : collect();
+                $custom = $prefix === 'REQ' ? CustomRequest::where('id', $id)->get() : collect();
             } else {
                 $health = collect();
                 $medicine = collect();
                 $silid = collect();
                 $sports = collect();
+                $custom = collect();
             }
 
             $health = $health->map(function ($item) {
@@ -91,11 +95,23 @@ class TrackRequestController extends Controller
                 return $item;
             });
 
+            $custom = $custom->map(function ($item) {
+                $item->type_label = $item->initiative ? $item->initiative->title : 'Custom Request';
+                $item->type_prefix = 'REQ';
+                $item->type_slug = 'custom';
+                $item->icon = '📝';
+                $item->icon_name = 'forms';
+                $item->title = $item->first_name . ' ' . $item->last_name;
+                $item->summary = 'Form Submission for ' . ($item->initiative ? $item->initiative->title : 'Initiative');
+                return $item;
+            });
+
             $results = collect()
                 ->concat($health)
                 ->concat($medicine)
                 ->concat($silid)
                 ->concat($sports)
+                ->concat($custom)
                 ->sortByDesc('created_at');
         }
 
@@ -131,6 +147,7 @@ class TrackRequestController extends Controller
             'medicine' => MedicineRequest::findOrFail($id),
             'silid' => SilidKarununganRequest::findOrFail($id),
             'sports' => SportsRegistration::findOrFail($id),
+            'custom' => CustomRequest::findOrFail($id),
             default => abort(404, 'Invalid request type')
         };
     }
@@ -154,6 +171,9 @@ class TrackRequestController extends Controller
             default => null
         };
         $initiative = $formRoute ? \App\Models\Initiative::where('form_route', $formRoute)->first() : null;
+        if ($type === 'custom') {
+            $initiative = $req->initiative;
+        }
 
         return view('track.edit', [
             'type' => $type,
@@ -181,6 +201,9 @@ class TrackRequestController extends Controller
             default => null
         };
         $initiative = $formRoute ? \App\Models\Initiative::where('form_route', $formRoute)->first() : null;
+        if ($type === 'custom') {
+            $initiative = $req->initiative;
+        }
 
         $rules = match ($type) {
             'health' => [
@@ -226,6 +249,11 @@ class TrackRequestController extends Controller
                 'team_name' => ['nullable', 'string', 'max:255'],
                 'event_date' => ['required', 'date', 'after_or_equal:today'],
                 'remarks' => ['nullable', 'string'],
+            ],
+            'custom' => [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'email', 'max:255'],
             ]
         };
 

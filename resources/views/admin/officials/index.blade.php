@@ -63,10 +63,29 @@
                                     </div>
                                     <div class="flex gap-2">
                                         <a href="{{ route('admin.officials.edit', $official) }}" class="text-[10px] font-bold uppercase text-[#1e40af] px-3 py-2 bg-blue-50 rounded-lg min-h-10 inline-flex items-center">Edit</a>
-                                        <form method="POST" action="{{ route('admin.officials.destroy', $official) }}" onsubmit="return confirm('Delete this official profile?')">
-                                            @csrf @method('DELETE')
-                                            <button type="submit" class="text-[10px] font-bold uppercase text-rose-700 px-3 py-2 bg-rose-50 rounded-lg min-h-10">Delete</button>
-                                        </form>
+                                        <x-alert-dialog>
+                                            <x-slot name="trigger">
+                                                <button class="text-[10px] font-bold uppercase text-rose-700 px-3 py-2 bg-rose-50 rounded-lg min-h-10">Delete</button>
+                                            </x-slot>
+                                            <x-slot name="icon">
+                                                <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                            </x-slot>
+                                            <x-slot name="title">Delete Official</x-slot>
+                                            <x-slot name="description">
+                                                Are you sure you want to delete this official's profile? This action cannot be undone.
+                                            </x-slot>
+                                            <x-slot name="footer">
+                                                <button @click="open = false" type="button" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                    Cancel
+                                                </button>
+                                                <form method="POST" action="{{ route('admin.officials.destroy', $official) }}" class="inline">
+                                                    @csrf @method('DELETE')
+                                                    <button type="submit" class="py-2 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </x-slot>
+                                        </x-alert-dialog>
                                     </div>
                                 </div>
                             </li>
@@ -109,13 +128,34 @@
                                                 <span class="text-[9px] font-black uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded-full">Hidden</span>
                                             @endif
                                         </td>
-                                        <td class="p-4 pr-6 text-right space-x-2 whitespace-nowrap">
-                                            <a href="{{ route('officials.show', $official->slug) }}" target="_blank" class="text-[10px] font-bold uppercase text-slate-500 hover:text-[#1e40af]">View</a>
-                                            <a href="{{ route('admin.officials.edit', $official) }}" class="text-[10px] font-bold uppercase text-[#1e40af] px-2 py-1 bg-blue-50 rounded-lg">Edit</a>
-                                            <form method="POST" action="{{ route('admin.officials.destroy', $official) }}" class="inline" onsubmit="return confirm('Delete this official profile?')">
-                                                @csrf @method('DELETE')
-                                                <button type="submit" class="text-[10px] font-bold uppercase text-rose-700 px-2 py-1 bg-rose-50 rounded-lg">Delete</button>
-                                            </form>
+                                        <td class="p-4 pr-6 text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <a href="{{ route('officials.show', $official->slug) }}" target="_blank" class="inline-flex items-center text-[10px] font-bold uppercase text-slate-500 px-2.5 py-1.5 bg-slate-100 rounded-lg hover:bg-slate-200 transition">View</a>
+                                                <a href="{{ route('admin.officials.edit', $official) }}" class="inline-flex items-center text-[10px] font-bold uppercase text-[#1e40af] px-2.5 py-1.5 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Edit</a>
+                                                <x-alert-dialog>
+                                                    <x-slot name="trigger">
+                                                        <button class="inline-flex items-center text-[10px] font-bold uppercase text-rose-700 px-2.5 py-1.5 bg-rose-50 rounded-lg hover:bg-rose-100 transition">Delete</button>
+                                                    </x-slot>
+                                                    <x-slot name="icon">
+                                                        <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                    </x-slot>
+                                                    <x-slot name="title">Delete Official</x-slot>
+                                                    <x-slot name="description">
+                                                        Are you sure you want to delete this official's profile? This action cannot be undone.
+                                                    </x-slot>
+                                                    <x-slot name="footer">
+                                                        <button @click="open = false" type="button" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                            Cancel
+                                                        </button>
+                                                        <form method="POST" action="{{ route('admin.officials.destroy', $official) }}" class="inline">
+                                                            @csrf @method('DELETE')
+                                                            <button type="submit" class="py-2 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                                Delete
+                                                            </button>
+                                                        </form>
+                                                    </x-slot>
+                                                </x-alert-dialog>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach

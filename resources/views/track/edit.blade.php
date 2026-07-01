@@ -38,6 +38,7 @@
             'medicine' => 'Pabili Medicine Services',
             'silid' => 'Silid Karunungan Booking',
             'sports' => 'Sports Registration',
+            'custom' => ($req->initiative ? $req->initiative->title : 'Custom Request'),
             default => 'Request'
         };
     @endphp
@@ -140,6 +141,12 @@
             <x-form-input label="Preferred Event Date" name="event_date" type="date" min="{{ date('Y-m-d') }}" required="true" value="{{ $req->event_date?->format('Y-m-d') }}" />
 
             <x-form-input label="Remarks / Queries" name="remarks" type="textarea" placeholder="Add any special requirements, team configurations, or general remarks..." value="{{ $req->remarks }}" />
+        @elseif($type === 'custom')
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <x-form-input label="First Name" name="first_name" required="true" value="{{ $req->first_name }}" />
+                <x-form-input label="Last Name" name="last_name" required="true" value="{{ $req->last_name }}" />
+            </div>
+            <x-form-input label="Email Address" name="email" type="email" required="true" value="{{ $req->email }}" />
         @endif
 
         @if($initiative && is_array($initiative->custom_fields) && count($initiative->custom_fields) > 0)

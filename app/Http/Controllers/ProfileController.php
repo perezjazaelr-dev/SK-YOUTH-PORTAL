@@ -6,6 +6,7 @@ use App\Models\HealthRequest;
 use App\Models\MedicineRequest;
 use App\Models\SilidKarununganRequest;
 use App\Models\SportsRegistration;
+use App\Models\CustomRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -62,11 +63,21 @@ class ProfileController extends Controller
             return $item;
         });
 
+        $custom = CustomRequest::with('processedBy')->where('email', $email)->get()->map(function ($item) {
+            $item->type_label = $item->initiative ? $item->initiative->title : 'Custom Request';
+            $item->type_prefix = 'REQ';
+            $item->icon = '📝';
+            $item->icon_name = 'forms';
+            $item->detail = 'Form Submission for ' . ($item->initiative ? $item->initiative->title : 'Initiative');
+            return $item;
+        });
+
         $results = collect()
             ->concat($health)
             ->concat($medicine)
             ->concat($silid)
             ->concat($sports)
+            ->concat($custom)
             ->sortByDesc('created_at');
 
         // Calculate counts

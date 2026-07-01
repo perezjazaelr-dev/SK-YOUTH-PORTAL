@@ -16,6 +16,23 @@ class ExportController extends Controller
      */
     public function export($type): StreamedResponse
     {
+        $initiativeId = null;
+        if (str_starts_with($type, 'init_')) {
+            $initiativeId = (int) str_replace('init_', '', $type);
+            $initiative = \App\Models\Initiative::findOrFail($initiativeId);
+            if ($initiative->form_route) {
+                $type = match ($initiative->form_route) {
+                    'forms.health.create', 'forms.mental-health.create' => 'health',
+                    'forms.medicine.create' => 'medicine',
+                    'forms.silid.create' => 'silid',
+                    'forms.sports.create' => 'sports',
+                    default => 'custom'
+                };
+            } else {
+                $type = 'custom';
+            }
+        }
+
         $headers = [
             'Content-Type' => 'text/csv',
             'Content-Disposition' => 'attachment; filename="export_' . $type . '_' . date('Ymd_His') . '.csv"',
@@ -24,7 +41,7 @@ class ExportController extends Controller
             'Expires' => '0',
         ];
 
-        return new StreamedResponse(function () use ($type) {
+        return new StreamedResponse(function () use ($type, $initiativeId) {
             $handle = fopen('php://output', 'w');
 
             // Add UTF-8 BOM for Excel compatibility
@@ -112,6 +129,28 @@ class ExportController extends Controller
                                 $record->team_name,
                                 $record->event_date->format('Y-m-d'),
                                 $record->remarks,
+                                $record->status,
+                                $record->created_at->format('Y-m-d H:i:s'),
+                            ]);
+                        }
+                    });
+                    break;
+
+                case 'custom':
+                    fputcsv($handle, ['ID', 'Initiative ID', 'Initiative Title', 'First Name', 'Last Name', 'Email', 'Status', 'Date Submitted']);
+                    $query = \App\Models\CustomRequest::with('initiative');
+                    if ($initiativeId) {
+                        $query->where('initiative_id', $initiativeId);
+                    }
+                    $query->chunk(100, function ($records) use ($handle) {
+                        foreach ($records as $record) {
+                            fputcsv($handle, [
+                                $record->id,
+                                $record->initiative_id,
+                                $record->initiative ? $record->initiative->title : '',
+                                $record->first_name,
+                                $record->last_name,
+                                $record->email,
                                 $record->status,
                                 $record->created_at->format('Y-m-d H:i:s'),
                             ]);

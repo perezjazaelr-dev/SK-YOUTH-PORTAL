@@ -5,31 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class SportsRegistration extends Model
+class CustomRequest extends Model
 {
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
+        'initiative_id',
         'first_name',
         'last_name',
-        'middle_name',
-        'age',
-        'gender',
         'email',
-        'contact_number',
-        'sport',
-        'division',
-        'team_name',
-        'event_date',
-        'remarks',
         'status',
         'custom_fields',
         'processed_by',
     ];
 
-    /**
-     * Relationship: A request has a user who processed it.
-     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function initiative()
+    {
+        return $this->belongsTo(Initiative::class);
+    }
+
     public function processedBy()
     {
         return $this->belongsTo(User::class, 'processed_by');
@@ -38,8 +38,6 @@ class SportsRegistration extends Model
     protected function casts(): array
     {
         return [
-            'event_date' => 'date',
-            'age' => 'integer',
             'custom_fields' => 'array',
         ];
     }
@@ -50,7 +48,7 @@ class SportsRegistration extends Model
             try {
                 \Illuminate\Support\Facades\Mail::to($model->email)->send(new \App\Mail\RequestReceivedMail($model));
             } catch (\Exception $e) {
-                // Silently swallow mail exceptions so HTTP transaction succeeds
+                // Silently swallow mail exceptions
             }
         });
     }

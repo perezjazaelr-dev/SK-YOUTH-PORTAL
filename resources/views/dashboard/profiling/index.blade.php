@@ -264,6 +264,7 @@
                     <input type="hidden" name="lgbtqia" :value="lgbt">
                     <input type="hidden" name="pwd" :value="pwd">
                     <input type="hidden" name="status" value="{{ $statusFilter }}">
+                    <input type="hidden" name="archive" value="{{ $showArchive ? '1' : '0' }}">
 
                     <!-- Row 1: Search, Purok, Year -->
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -404,6 +405,13 @@
                         <!-- Right Primary Trigger -->
                         <div class="flex items-center space-x-3 text-right">
                             <button type="submit" class="hidden"></button> <!-- form submission placeholder -->
+                            <a href="{{ route('dashboard.profiling.index', array_merge(request()->query(), ['archive' => $showArchive ? '0' : '1'])) }}" 
+                               class="btn-primary text-[11px] font-black uppercase py-2 px-5 flex items-center space-x-1.5 cursor-pointer transition shadow-sm border rounded-2xl {{ $showArchive ? 'bg-[#1e40af] hover:bg-blue-700 text-white border-transparent' : 'bg-slate-100 hover:bg-slate-200/80 text-slate-650 border-slate-250' }}">
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+                                </svg>
+                                <span>Archive ({{ $archivedCount }})</span>
+                            </a>
                             <a href="{{ route('dashboard.export', ['profiling']) }}" 
                                class="btn-primary text-[11px] font-black uppercase py-2 px-5 flex items-center space-x-1.5 cursor-pointer bg-emerald-600 hover:bg-emerald-700 active:scale-95 transition shadow-sm border border-transparent rounded-2xl">
                                 <span>Export CSV</span>
@@ -596,57 +604,91 @@
 
                                         <!-- Status -->
                                         <td class="py-4 px-6">
-                                            @if($profile->status === 'approved')
-                                                <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Approved</span>
-                                            @elseif($profile->status === 'pending')
-                                                <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Pending Review</span>
+                                            @if($profile->deleted_at !== null)
+                                                <span class="px-2.5 py-0.5 bg-rose-100 text-rose-700 border border-rose-200 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Archived (Removed)</span>
+                                            @elseif($profile->age > 30)
+                                                <span class="px-2.5 py-0.5 bg-amber-100 text-amber-700 border border-amber-250 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Archived (Age > 30)</span>
                                             @else
-                                                <span class="px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Declined</span>
+                                                @if($profile->status === 'approved')
+                                                    <span class="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Approved</span>
+                                                @elseif($profile->status === 'pending')
+                                                    <span class="px-2.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Pending Review</span>
+                                                @else
+                                                    <span class="px-2.5 py-0.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-full text-[9px] font-extrabold uppercase tracking-wide">Declined</span>
+                                                @endif
                                             @endif
                                         </td>
 
                                         <!-- Actions -->
-                                        <td class="py-4 px-6 text-center whitespace-nowrap">
-                                            <div class="flex items-center justify-center space-x-2">
-                                                <!-- Approve/Decline Buttons for Pending citizens -->
-                                                @if($profile->status === 'pending')
-                                                    <form action="{{ route('dashboard.profiling.approve', $profile) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="p-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg hover:bg-emerald-600 hover:text-white transition active:scale-95" title="Approve Profile">
-                                                            <svg class="w-4 h-4 text-emerald-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                                        </button>
-                                                    </form>
+                                         <td class="py-4 px-6 text-center whitespace-nowrap">
+                                             <div class="flex items-center justify-center space-x-2">
+                                                 @if($profile->deleted_at !== null)
+                                                     <form action="{{ route('dashboard.profiling.restore', $profile->id) }}" method="POST" class="inline">
+                                                         @csrf
+                                                         <button type="submit" class="p-1.5 bg-indigo-50 text-[#1e40af] border border-blue-100 rounded-lg hover:bg-[#1e40af] hover:text-white transition active:scale-95" title="Restore Profile">
+                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H18v3.582"></path></svg>
+                                                         </button>
+                                                     </form>
+                                                 @else
+                                                     <!-- Approve/Decline Buttons for Pending citizens -->
+                                                     @if($profile->status === 'pending')
+                                                         <form action="{{ route('dashboard.profiling.approve', $profile) }}" method="POST" class="inline">
+                                                             @csrf
+                                                             @method('PATCH')
+                                                             <button type="submit" class="p-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg hover:bg-emerald-600 hover:text-white transition active:scale-95" title="Approve Profile">
+                                                                 <svg class="w-4 h-4 text-emerald-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                                             </button>
+                                                         </form>
 
-                                                    <form action="{{ route('dashboard.profiling.decline', $profile) }}" method="POST" class="inline">
-                                                        @csrf
-                                                        @method('PATCH')
-                                                        <button type="submit" class="p-1.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg hover:bg-rose-600 hover:text-white transition active:scale-95" title="Decline Profile">
-                                                            <svg class="w-4 h-4 text-rose-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                                        </button>
-                                                    </form>
-                                                @endif
+                                                         <form action="{{ route('dashboard.profiling.decline', $profile) }}" method="POST" class="inline">
+                                                             @csrf
+                                                             @method('PATCH')
+                                                             <button type="submit" class="p-1.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg hover:bg-rose-600 hover:text-white transition active:scale-95" title="Decline Profile">
+                                                                 <svg class="w-4 h-4 text-rose-700 hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                             </button>
+                                                         </form>
+                                                     @endif
 
-                                                <!-- View Button -->
-                                                <button type="button" @click="openView({{ json_encode($profile->toPresentableArray(auth()->user())) }}, '{{ $profile->purok->purok_name }}')" class="p-1.5 bg-blue-50 text-[#1e40af] border border-blue-100 rounded-lg hover:bg-[#1e40af] hover:text-white transition active:scale-95" title="View Profile">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                                                </button>
+                                                     <!-- View Button -->
+                                                     <button type="button" @click="openView({{ json_encode($profile->toPresentableArray(auth()->user())) }}, '{{ $profile->purok->purok_name }}')" class="p-1.5 bg-blue-50 text-[#1e40af] border border-blue-100 rounded-lg hover:bg-[#1e40af] hover:text-white transition active:scale-95" title="View Profile">
+                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                                     </button>
 
-                                                <!-- Edit Button -->
-                                                <button type="button" @click="openEdit({{ json_encode($profile->toPresentableArray(auth()->user())) }})" class="p-1.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg hover:bg-amber-600 hover:text-white transition active:scale-95" title="Edit Profile">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                                </button>
+                                                     <!-- Edit Button -->
+                                                     <button type="button" @click="openEdit({{ json_encode($profile->toPresentableArray(auth()->user())) }})" class="p-1.5 bg-amber-50 text-amber-700 border border-amber-100 rounded-lg hover:bg-amber-600 hover:text-white transition active:scale-95" title="Edit Profile">
+                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                                     </button>
 
-                                                <!-- Delete Button -->
-                                                <form action="{{ route('dashboard.profiling.destroy', $profile) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this profile? This action cannot be undone.')" class="inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="p-1.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg hover:bg-rose-600 hover:text-white transition active:scale-95" title="Delete Profile">
-                                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
+                                                     <!-- Delete Button -->
+                                                     <x-alert-dialog>
+                                                         <x-slot name="trigger">
+                                                             <button class="p-1.5 bg-rose-50 text-rose-700 border border-rose-100 rounded-lg hover:bg-rose-600 hover:text-white transition active:scale-95" title="Archive Profile">
+                                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                             </button>
+                                                         </x-slot>
+                                                         <x-slot name="icon">
+                                                             <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                                         </x-slot>
+                                                         <x-slot name="title">Archive Profile</x-slot>
+                                                         <x-slot name="description">
+                                                             Are you sure you want to archive this profile? This action will hide the profile from active records.
+                                                         </x-slot>
+                                                         <x-slot name="footer">
+                                                             <button @click="open = false" type="button" class="py-2 px-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                                 Cancel
+                                                             </button>
+                                                             <form action="{{ route('dashboard.profiling.destroy', $profile) }}" method="POST" class="inline">
+                                                                 @csrf
+                                                                 @method('DELETE')
+                                                                 <button type="submit" class="py-2 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl transition">
+                                                                     Confirm Archive
+                                                                 </button>
+                                                             </form>
+                                                         </x-slot>
+                                                     </x-alert-dialog>
+                                                 @endif
+                                             </div>
+                                         </td>
                                     </tr>
                                 @endforeach
                             </tbody>

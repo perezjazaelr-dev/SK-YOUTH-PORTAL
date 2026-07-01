@@ -174,15 +174,15 @@
                                            class="px-3.5 py-1.5 border border-slate-200 text-slate-600 hover:text-[#1e40af] hover:border-[#1e40af] font-bold rounded-xl text-[10px] uppercase tracking-wider transition active:scale-95">
                                             Track Progress
                                         </a>
-                                        @if($init->form_route)
-                                            <a href="{{ route($init->form_route) }}" 
-                                               class="px-3.5 py-1.5 bg-[#1e40af] text-white hover:bg-blue-700 font-bold rounded-xl text-[10px] uppercase tracking-wider transition active:scale-95">
-                                                Apply Now
-                                            </a>
-                                        @else
+                                        @if($init->is_coming_soon)
                                             <span class="px-3.5 py-1.5 bg-slate-100 text-slate-400 font-bold rounded-xl text-[10px] uppercase tracking-wider select-none">
                                                 Coming Soon
                                             </span>
+                                        @else
+                                            <a href="{{ route('forms.custom.create', $init->id) }}" 
+                                               class="px-3.5 py-1.5 bg-[#1e40af] text-white hover:bg-blue-700 font-bold rounded-xl text-[10px] uppercase tracking-wider transition active:scale-95">
+                                                Apply Now
+                                            </a>
                                         @endif
                                     </div>
                                 </div>

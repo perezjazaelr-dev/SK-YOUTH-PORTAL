@@ -31,6 +31,7 @@ class SportsRegistrationFormRequest extends FormRequest
             'email' => ['required', 'email', 'max:255'],
             'contact_number' => ['required', 'string', 'max:20'],
             'sport' => ['required', 'string'],
+            'division' => ['nullable', 'string', 'max:255'],
             'team_name' => ['nullable', 'string', 'max:255'],
             'event_date' => ['required', 'date', 'after_or_equal:today'],
             'remarks' => ['nullable', 'string'],

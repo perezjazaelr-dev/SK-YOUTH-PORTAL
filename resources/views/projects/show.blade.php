@@ -103,8 +103,12 @@
                     <p class="text-xs text-slate-500 leading-relaxed font-medium">{{ $activeInitiative->description }}</p>
                 </div>
                 
-                @if($activeInitiative->form_route)
-                    <a href="{{ route($activeInitiative->form_route) }}" class="btn-primary text-xs shrink-0 flex items-center space-x-1.5 shadow-md hover:shadow-blue-500/20 active:scale-95 transition relative z-10 self-start sm:self-center">
+                @if($activeInitiative->is_coming_soon)
+                    <span class="bg-slate-100 text-slate-400 border border-slate-200 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full self-start sm:self-center select-none">
+                        Coming Soon
+                    </span>
+                @else
+                    <a href="{{ route('forms.custom.create', $activeInitiative->id) }}" class="btn-primary text-xs shrink-0 flex items-center space-x-1.5 shadow-md hover:shadow-blue-500/20 active:scale-95 transition relative z-10 self-start sm:self-center">
                         <span>➕ Submit Request</span>
                     </a>
                 @endif
@@ -269,8 +273,12 @@
                     <a href="{{ route('track.index') }}" class="px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white font-bold rounded-xl text-xs uppercase tracking-wider transition active:scale-95">
                         🔍 Track Request
                     </a>
-                    @if($activeInitiative->form_route)
-                        <a href="{{ route($activeInitiative->form_route) }}" class="px-5 py-2.5 bg-white text-[#1e40af] hover:bg-blue-50 font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-sm active:scale-95">
+                    @if($activeInitiative->is_coming_soon)
+                        <span class="px-5 py-2.5 bg-white/10 text-slate-300 border border-white/10 font-bold rounded-xl text-xs uppercase tracking-wider select-none">
+                            Coming Soon
+                        </span>
+                    @else
+                        <a href="{{ route('forms.custom.create', $activeInitiative->id) }}" class="px-5 py-2.5 bg-white text-[#1e40af] hover:bg-blue-50 font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-sm active:scale-95">
                             ➕ Apply Now
                         </a>
                     @endif

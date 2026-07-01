@@ -463,7 +463,7 @@ class KkProfilingTest extends TestCase
         $response->assertRedirect('/dashboard/profiling');
         $response->assertSessionHas('success');
 
-        $this->assertDatabaseMissing('kk_profiles', [
+        $this->assertSoftDeleted('kk_profiles', [
             'id' => $profile->id,
         ]);
 
@@ -826,7 +826,7 @@ class KkProfilingTest extends TestCase
         $responseResubmit->assertRedirect('/profile/my-requests');
 
         // Assert old record was deleted and new record is pending
-        $this->assertDatabaseMissing('kk_profiles', ['id' => $profile->id]);
+        $this->assertSoftDeleted('kk_profiles', ['id' => $profile->id]);
         
         $newProfile = KkProfile::where('email', $citizen->email)->first();
         $this->assertNotNull($newProfile);

@@ -154,9 +154,20 @@ class StructureManagementTest extends TestCase
         $this->assertEquals('Age Limit', $newInitiative->custom_fields[0]['label']);
         $this->assertFalse($newInitiative->custom_fields[0]['required']);
 
-        // Superadmin can delete an initiative
-        $responseDeleteInitiative = $this->actingAs($user)->delete("/admin/structure/initiatives/{$newInitiative->id}");
+        // Superadmin can archive (soft-delete) an initiative
+        $responseDeleteInitiative = $this->actingAs($user)->delete("/admin/structure/initiatives/{$newInitiative->id}", [
+            'password' => 'password',
+        ]);
         $responseDeleteInitiative->assertRedirect();
+        $this->assertSoftDeleted('initiatives', [
+            'id' => $newInitiative->id,
+        ]);
+
+        // Superadmin can permanently delete the initiative from archive
+        $responseForceDelete = $this->actingAs($user)->delete("/admin/structure/initiatives/{$newInitiative->id}/force-delete", [
+            'password' => 'password',
+        ]);
+        $responseForceDelete->assertRedirect();
         $this->assertDatabaseMissing('initiatives', [
             'id' => $newInitiative->id,
         ]);
@@ -165,13 +176,14 @@ class StructureManagementTest extends TestCase
         $eduCommittee = Committee::where('slug', 'education')->first();
         $eduInitiatives = $eduCommittee->initiatives->pluck('id')->toArray();
         
-        $responseDeleteCommittee = $this->actingAs($user)->delete("/admin/structure/committees/{$eduCommittee->id}");
+        $responseDeleteCommittee = $this->actingAs($user)->delete("/admin/structure/committees/{$eduCommittee->id}", [
+            'password' => 'password',
+        ]);
         $responseDeleteCommittee->assertRedirect();
         
-        $this->assertDatabaseMissing('committees', ['id' => $eduCommittee->id]);
+        $this->assertSoftDeleted('committees', ['id' => $eduCommittee->id]);
         foreach ($eduInitiatives as $id) {
-            $this->assertDatabaseMissing('initiatives', ['id' => $id]);
-            $this->assertDatabaseMissing('accomplishment_reports', ['initiative_id' => $id]);
+            $this->assertSoftDeleted('initiatives', ['id' => $id]);
         }
     }
 }

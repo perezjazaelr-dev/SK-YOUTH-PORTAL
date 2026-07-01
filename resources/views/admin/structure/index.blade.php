@@ -19,7 +19,8 @@
     showAddInitiative: false, 
     activeAdminTab: 'structure',
     showEditInitiative: false,
-    editInitiative: { id: null, title: '', description: '', form_route: '', custom_fields: [] },
+    editInitiative: { id: null, title: '', description: '', form_route: '', custom_fields: [], is_coming_soon: false, show_in_quick_forms: false },
+    addInitiative: { custom_fields: [] },
     newCustomFields: [],
     openEditModal(initiative) {
         this.editInitiative = {
@@ -27,6 +28,8 @@
             title: initiative.title ?? '',
             description: initiative.description ?? '',
             form_route: initiative.form_route ?? '',
+            is_coming_soon: initiative.is_coming_soon ? 1 : 0,
+            show_in_quick_forms: initiative.show_in_quick_forms ? 1 : 0,
             custom_fields: Array.isArray(initiative.custom_fields)
                 ? JSON.parse(JSON.stringify(initiative.custom_fields))
                 : []
@@ -301,7 +304,7 @@
                              x-cloak>
                             <form method="POST" action="{{ route('admin.structure.initiative.store') }}" class="space-y-4">
                                 @csrf
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label for="committee_id" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Target Committee</label>
                                         <select name="committee_id" id="committee_id" required class="field text-xs py-2.5 pr-8 bg-white">
@@ -315,18 +318,18 @@
                                         @enderror
                                     </div>
                                     <div>
-                                        <label for="form_route" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Linked Form (Optional)</label>
-                                        <select name="form_route" id="form_route" class="field text-xs py-2.5 pr-8 bg-white">
-                                            <option value="">None (No Form Linked)</option>
-                                            <option value="forms.health.create" {{ old('form_route') == 'forms.health.create' ? 'selected' : '' }}>Health Consultation Form</option>
-                                            <option value="forms.mental-health.create" {{ old('form_route') == 'forms.mental-health.create' ? 'selected' : '' }}>Mental Health Support Form</option>
-                                            <option value="forms.medicine.create" {{ old('form_route') == 'forms.medicine.create' ? 'selected' : '' }}>Pabili Medicine Services Form</option>
-                                            <option value="forms.silid.create" {{ old('form_route') == 'forms.silid.create' ? 'selected' : '' }}>Silid Karunungan Booking Form</option>
-                                            <option value="forms.sports.create" {{ old('form_route') == 'forms.sports.create' ? 'selected' : '' }}>Sports League Registration Form</option>
+                                        <label for="is_coming_soon" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Publishing Status</label>
+                                        <select name="is_coming_soon" id="is_coming_soon" class="field text-xs py-2.5 pr-8 bg-white">
+                                            <option value="0" {{ old('is_coming_soon') == '0' ? 'selected' : '' }}>Published</option>
+                                            <option value="1" {{ old('is_coming_soon') == '1' ? 'selected' : '' }}>Draft / Coming Soon</option>
                                         </select>
-                                        @error('form_route')
-                                            <p class="text-rose-600 text-[11px] mt-1 font-semibold">{{ $message }}</p>
-                                        @enderror
+                                    </div>
+                                    <div>
+                                        <label for="show_in_quick_forms" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Quick Form Access</label>
+                                        <select name="show_in_quick_forms" id="show_in_quick_forms" class="field text-xs py-2.5 pr-8 bg-white">
+                                            <option value="1" {{ old('show_in_quick_forms') == '1' ? 'selected' : '' }}>Show in Quick Forms</option>
+                                            <option value="0" {{ old('show_in_quick_forms', '0') == '0' ? 'selected' : '' }}>Hide from Quick Forms</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div>
@@ -345,9 +348,88 @@
                                 </div>
 
                                 <!-- Custom Fields Builder for Add Initiative -->
-                                <div class="pt-4 border-t border-slate-200 mt-4">
-                                    @livewire('form-builder')
+                                <div class="space-y-4 pt-4 border-t border-slate-200 mt-4">
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 font-display">Custom Form Fields</h4>
+                                            <p class="text-[10px] text-slate-400">Configure custom fields to request from citizens upon submission.</p>
+                                        </div>
+                                        <button type="button" 
+                                                @click="addInitiative.custom_fields.push({ label: '', name: '', type: 'text', required: false, placeholder: '' })"
+                                                class="btn-success btn-sm flex items-center space-x-1">
+                                            <span>➕ Add Field</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="space-y-4">
+                                        <div x-show="addInitiative.custom_fields.length === 0" class="text-center py-6 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-[11px] text-slate-400">
+                                            No custom fields configured. Standard fields will be used.
+                                        </div>
+
+                                        <template x-for="(field, index) in addInitiative.custom_fields" :key="index">
+                                            <div class="p-4 bg-slate-100/50 border border-slate-200/60 rounded-2xl space-y-4 relative shadow-sm text-left">
+                                                <button type="button" 
+                                                        @click="addInitiative.custom_fields.splice(index, 1)" 
+                                                        class="absolute top-3 right-3 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 transition active:scale-90" 
+                                                        title="Remove Field">
+                                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mr-6">
+                                                    <div>
+                                                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Label (Citizen Visible)</label>
+                                                        <input type="text" 
+                                                               :name="`custom_fields[${index}][label]`" 
+                                                               x-model="field.label" 
+                                                               required 
+                                                               @input="if(!field.name) { field.name = field.label.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0,30); }"
+                                                               class="field text-[11px] py-2 bg-white" 
+                                                               placeholder="e.g. High School Attended">
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Key (Short alphanumeric name)</label>
+                                                        <input type="text" 
+                                                               :name="`custom_fields[${index}][name]`" 
+                                                               x-model="field.name" 
+                                                               required 
+                                                               @input="field.name = field.name.toLowerCase().replace(/[^a-z0-9_]/g, '_')"
+                                                               class="field text-[11px] py-2 bg-white font-mono" 
+                                                               placeholder="e.g. high_school_attended">
+                                                    </div>
+                                                </div>
+
+                                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div>
+                                                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Input Type</label>
+                                                        <select :name="`custom_fields[${index}][type]`" x-model="field.type" class="field text-[11px] py-2 pr-8 bg-white">
+                                                            <option value="text">Single Line Text</option>
+                                                            <option value="textarea">Multi-line Paragraph</option>
+                                                            <option value="number">Numeric Value</option>
+                                                            <option value="date">Date Selector</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Input Placeholder / Hint</label>
+                                                        <input type="text" :name="`custom_fields[${index}][placeholder]`" x-model="field.placeholder" class="field text-[11px] py-2 bg-white" placeholder="e.g. Enter name of school...">
+                                                    </div>
+                                                    <div class="flex items-center pt-5">
+                                                        <label class="inline-flex items-center text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none">
+                                                            <input type="checkbox" 
+                                                                   :name="`custom_fields[${index}][required]`" 
+                                                                   x-model="field.required" 
+                                                                   class="rounded border-slate-300 text-[#1e40af] focus:ring-[#1e40af]/20 mr-2 w-4 h-4">
+                                                            Required Input Field
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
+
+
 
                                 <button type="submit" class="btn-primary text-xs w-full justify-center py-2.5">Add Initiative</button>
                             </form>
@@ -389,15 +471,7 @@
                                                             <h5 class="text-xs font-black text-slate-850 group-hover/initiative:text-[#1e40af] transition duration-150 truncate" title="{{ $initiative->title }}">{{ $initiative->title }}</h5>
                                                             <p class="text-xs text-slate-500 leading-relaxed">{{ $initiative->description }}</p>
                                                             <div class="flex flex-wrap items-center gap-1.5 pt-1">
-                                                                @if($initiative->form_route)
-                                                                    <span class="px-2 py-0.5 bg-blue-50 border border-blue-100/30 text-blue-700 rounded-lg text-[9px] font-bold tracking-wide font-mono">
-                                                                        Form: {{ $initiative->form_route }}
-                                                                    </span>
-                                                                @else
-                                                                    <span class="px-2 py-0.5 bg-slate-50 border border-slate-100 text-slate-400 rounded-lg text-[9px] font-bold tracking-wide font-mono">
-                                                                        No Form Linked
-                                                                    </span>
-                                                                @endif
+
                                                                 <span class="px-2 py-0.5 bg-emerald-50 border border-emerald-100/30 text-emerald-700 rounded-lg text-[9px] font-bold tracking-wide font-mono">
                                                                     {{ $initiative->accomplishment_reports_count ?? 0 }} Reports
                                                                 </span>
@@ -405,7 +479,7 @@
                                                         </div>
                                                         @if(Auth::user()->isAdmin())
                                                             <div class="flex items-center space-x-1 shrink-0">
-                                                                <button type="button" @click="openEditModal(@js(['id' => $initiative->id, 'title' => $initiative->title, 'description' => $initiative->description, 'form_route' => $initiative->form_route ?? '', 'custom_fields' => $initiative->custom_fields ?? []]))" class="p-2 bg-blue-50 hover:bg-blue-100 text-[#1e40af] hover:text-blue-800 rounded-xl transition active:scale-90 cursor-pointer mr-1" title="Edit Initiative" aria-label="Edit {{ $initiative->title }}">
+                                                                <button type="button" @click="openEditModal(@js(['id' => $initiative->id, 'title' => $initiative->title, 'description' => $initiative->description, 'form_route' => $initiative->form_route ?? '', 'is_coming_soon' => $initiative->is_coming_soon, 'show_in_quick_forms' => $initiative->show_in_quick_forms, 'custom_fields' => $initiative->custom_fields ?? []]))" class="p-2 bg-blue-50 hover:bg-blue-100 text-[#1e40af] hover:text-blue-800 rounded-xl transition active:scale-90 cursor-pointer mr-1" title="Edit Initiative" aria-label="Edit {{ $initiative->title }}">
                                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                                     </svg>
@@ -431,14 +505,22 @@
                                                                 </x-slot:title>
                                                                 
                                                                 <x-slot:description>
-                                                                    Are you sure you want to permanently delete the initiative "{{ $initiative->title }}"? This will remove the initiative and all its accomplishment reports. This action cannot be undone.
+                                                                    <div class="space-y-4 text-left">
+                                                                        <p class="text-xs text-slate-500 leading-relaxed">
+                                                                            Are you sure you want to archive the initiative "{{ $initiative->title }}"? This will remove the initiative and all its accomplishment reports from the active portal. To proceed, please enter your password.
+                                                                        </p>
+                                                                        <div>
+                                                                            <label for="delete_initiative_password_{{ $initiative->id }}" class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Account Password</label>
+                                                                            <input type="password" name="password" id="delete_initiative_password_{{ $initiative->id }}" required form="delete_initiative_form_{{ $initiative->id }}" class="field text-xs py-2.5 bg-slate-50 border border-slate-200" placeholder="Enter your password to confirm">
+                                                                        </div>
+                                                                    </div>
                                                                 </x-slot:description>
                                                                 
                                                                 <x-slot:footer>
                                                                     <button type="button" @click="open = false" class="btn-outline text-xs py-2 px-4">
                                                                         Cancel
                                                                     </button>
-                                                                    <form method="POST" action="{{ route('admin.structure.initiative.destroy', $initiative->id) }}" class="inline">
+                                                                    <form id="delete_initiative_form_{{ $initiative->id }}" method="POST" action="{{ route('admin.structure.initiative.destroy', $initiative->id) }}" class="inline">
                                                                         @csrf
                                                                         @method('DELETE')
                                                                         <button type="submit" class="btn-danger py-2 text-xs">
@@ -494,110 +576,114 @@
                      @method('PUT')
 
                      <div class="space-y-4">
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div>
-                                 <label for="edit_title" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Initiative Title</label>
-                                 <input type="text" name="title" id="edit_title" required x-model="editInitiative.title" class="field text-xs py-2.5 bg-white" placeholder="e.g. Alternative Learning System">
-                             </div>
-                             <div>
-                                 <label for="edit_form_route" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Linked Form (Optional)</label>
-                                 <select name="form_route" id="edit_form_route" x-model="editInitiative.form_route" class="field text-xs py-2.5 pr-8 bg-white">
-                                     <option value="">None (No Form Linked)</option>
-                                     <option value="forms.health.create">Health Consultation Form</option>
-                                     <option value="forms.mental-health.create">Mental Health Support Form</option>
-                                     <option value="forms.medicine.create">Pabili Medicine Services Form</option>
-                                     <option value="forms.silid.create">Silid Karunungan Booking Form</option>
-                                     <option value="forms.sports.create">Sports League Registration Form</option>
-                                 </select>
-                             </div>
-                         </div>
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div>
+                                  <label for="edit_title" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Initiative Title</label>
+                                  <input type="text" name="title" id="edit_title" required x-model="editInitiative.title" class="field text-xs py-2.5 bg-white" placeholder="e.g. Alternative Learning System">
+                              </div>
+                              <div>
+                                  <label for="edit_is_coming_soon" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Publishing Status</label>
+                                  <select name="is_coming_soon" id="edit_is_coming_soon" x-model="editInitiative.is_coming_soon" class="field text-xs py-2.5 pr-8 bg-white">
+                                      <option value="0">Published</option>
+                                      <option value="1">Draft / Coming Soon</option>
+                                  </select>
+                              </div>
+                              <div>
+                                  <label for="edit_show_in_quick_forms" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Quick Form Access</label>
+                                  <select name="show_in_quick_forms" id="edit_show_in_quick_forms" x-model="editInitiative.show_in_quick_forms" class="field text-xs py-2.5 pr-8 bg-white">
+                                      <option value="1">Show in Quick Forms</option>
+                                      <option value="0">Hide from Quick Forms</option>
+                                  </select>
+                              </div>
+                          </div>
 
-                         <div>
-                             <label for="edit_description" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Description</label>
-                             <textarea name="description" id="edit_description" required rows="3" x-model="editInitiative.description" class="field text-xs py-2.5 bg-white" placeholder="Provide a short overview of this program initiative..."></textarea>
-                         </div>
-                     </div>
+                          <div>
+                              <label for="edit_description" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Description</label>
+                              <textarea name="description" id="edit_description" required rows="3" x-model="editInitiative.description" class="field text-xs py-2.5 bg-white" placeholder="Provide a short overview of this program initiative..."></textarea>
+                          </div>
+                      </div>
 
-                     <div class="space-y-4 pt-4 border-t border-slate-100">
-                         <div class="flex items-center justify-between">
-                             <div>
-                                 <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 font-display">Custom Form Fields</h4>
-                                 <p class="text-[10px] text-slate-400">Configure custom fields to request from citizens upon submission.</p>
-                             </div>
-                             <button type="button" 
-                                     @click="editInitiative.custom_fields.push({ label: '', name: '', type: 'text', required: false, placeholder: '' })"
-                                     class="btn-success btn-sm flex items-center space-x-1">
-                                 <span>➕ Add Field</span>
-                             </button>
-                         </div>
+                      <!-- Custom Fields Builder for Edit Initiative -->
+                      <div class="space-y-4 pt-4 border-t border-slate-150">
+                          <div class="flex items-center justify-between">
+                              <div>
+                                  <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 font-display">Custom Form Fields</h4>
+                                  <p class="text-[10px] text-slate-400">Configure custom fields to request from citizens upon submission.</p>
+                              </div>
+                              <button type="button" 
+                                      @click="editInitiative.custom_fields.push({ label: '', name: '', type: 'text', required: false, placeholder: '' })"
+                                      class="btn-success btn-sm flex items-center space-x-1">
+                                  <span>➕ Add Field</span>
+                              </button>
+                          </div>
 
-                         <div class="space-y-4">
-                             <div x-show="editInitiative.custom_fields.length === 0" class="text-center py-6 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-[11px] text-slate-400">
-                                 No custom fields configured. Standard fields will be used.
-                             </div>
+                          <div class="space-y-4">
+                              <div x-show="editInitiative.custom_fields.length === 0" class="text-center py-6 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-[11px] text-slate-400">
+                                  No custom fields configured. Standard fields will be used.
+                              </div>
 
-                             <template x-for="(field, index) in editInitiative.custom_fields" :key="index">
-                                 <div class="p-4 bg-slate-50 border border-slate-200/60 rounded-2xl space-y-4 relative shadow-sm">
-                                     <button type="button" 
-                                             @click="editInitiative.custom_fields.splice(index, 1)" 
-                                             class="absolute top-3 right-3 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-100 transition active:scale-90" 
-                                             title="Remove Field">
-                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                         </svg>
-                                     </button>
+                              <template x-for="(field, index) in editInitiative.custom_fields" :key="index">
+                                  <div class="p-4 bg-slate-100/50 border border-slate-200/60 rounded-2xl space-y-4 relative shadow-sm text-left">
+                                      <button type="button" 
+                                              @click="editInitiative.custom_fields.splice(index, 1)" 
+                                              class="absolute top-3 right-3 text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-200 transition active:scale-90" 
+                                              title="Remove Field">
+                                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                          </svg>
+                                      </button>
 
-                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mr-6">
-                                         <div>
-                                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Label (Citizen Visible)</label>
-                                             <input type="text" 
-                                                    :name="`custom_fields[${index}][label]`" 
-                                                    x-model="field.label" 
-                                                    required 
-                                                    @input="if(!field.name) { field.name = field.label.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0,30); }"
-                                                    class="field text-[11px] py-2 bg-white" 
-                                                    placeholder="e.g. High School Attended">
-                                         </div>
-                                         <div>
-                                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Key (Short alphanumeric name)</label>
-                                             <input type="text" 
-                                                    :name="`custom_fields[${index}][name]`" 
-                                                    x-model="field.name" 
-                                                    required 
-                                                    @input="field.name = field.name.toLowerCase().replace(/[^a-z0-9_]/g, '_')"
-                                                    class="field text-[11px] py-2 bg-white font-mono" 
-                                                    placeholder="e.g. high_school_attended">
-                                         </div>
-                                     </div>
+                                      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mr-6">
+                                          <div>
+                                              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Label (Citizen Visible)</label>
+                                              <input type="text" 
+                                                     :name="`custom_fields[${index}][label]`" 
+                                                     x-model="field.label" 
+                                                     required 
+                                                     @input="if(!field.name) { field.name = field.label.toLowerCase().replace(/[^a-z0-9]/g, '_').substring(0,30); }"
+                                                     class="field text-[11px] py-2 bg-white" 
+                                                     placeholder="e.g. High School Attended">
+                                          </div>
+                                          <div>
+                                              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Key (Short alphanumeric name)</label>
+                                              <input type="text" 
+                                                     :name="`custom_fields[${index}][name]`" 
+                                                     x-model="field.name" 
+                                                     required 
+                                                     @input="field.name = field.name.toLowerCase().replace(/[^a-z0-9_]/g, '_')"
+                                                     class="field text-[11px] py-2 bg-white font-mono" 
+                                                     placeholder="e.g. high_school_attended">
+                                          </div>
+                                      </div>
 
-                                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                         <div>
-                                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Input Type</label>
-                                             <select :name="`custom_fields[${index}][type]`" x-model="field.type" class="field text-[11px] py-2 pr-8 bg-white">
-                                                 <option value="text">Single Line Text</option>
-                                                 <option value="textarea">Multi-line Paragraph</option>
-                                                 <option value="number">Numeric Value</option>
-                                                 <option value="date">Date Selector</option>
-                                             </select>
-                                         </div>
-                                         <div>
-                                             <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Input Placeholder / Hint</label>
-                                             <input type="text" :name="`custom_fields[${index}][placeholder]`" x-model="field.placeholder" class="field text-[11px] py-2 bg-white" placeholder="e.g. Enter name of school...">
-                                         </div>
-                                         <div class="flex items-center pt-5">
-                                             <label class="inline-flex items-center text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none">
-                                                 <input type="checkbox" 
-                                                        :name="`custom_fields[${index}][required]`" 
-                                                        x-model="field.required" 
-                                                        class="rounded border-slate-300 text-[#1e40af] focus:ring-[#1e40af]/20 mr-2 w-4 h-4">
-                                                 Required Input Field
-                                             </label>
-                                         </div>
-                                     </div>
-                                 </div>
-                             </template>
-                         </div>
-                     </div>
+                                      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                          <div>
+                                              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Field Input Type</label>
+                                              <select :name="`custom_fields[${index}][type]`" x-model="field.type" class="field text-[11px] py-2 pr-8 bg-white">
+                                                  <option value="text">Single Line Text</option>
+                                                  <option value="textarea">Multi-line Paragraph</option>
+                                                  <option value="number">Numeric Value</option>
+                                                  <option value="date">Date Selector</option>
+                                              </select>
+                                          </div>
+                                          <div>
+                                              <label class="block text-[9px] font-bold text-slate-400 uppercase tracking-wider mb-1">Input Placeholder / Hint</label>
+                                              <input type="text" :name="`custom_fields[${index}][placeholder]`" x-model="field.placeholder" class="field text-[11px] py-2 bg-white" placeholder="e.g. Enter name of school...">
+                                          </div>
+                                          <div class="flex items-center pt-5">
+                                              <label class="inline-flex items-center text-[10px] font-bold text-slate-500 uppercase tracking-wider cursor-pointer select-none">
+                                                  <input type="checkbox" 
+                                                         :name="`custom_fields[${index}][required]`" 
+                                                         x-model="field.required" 
+                                                         class="rounded border-slate-300 text-[#1e40af] focus:ring-[#1e40af]/20 mr-2 w-4 h-4">
+                                                  Required Input Field
+                                              </label>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </template>
+                          </div>
+                      </div>
 
                      <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-100 shrink-0">
                          <button type="button" @click="showEditInitiative = false" class="btn-outline text-xs py-2.5 px-4 font-bold min-h-11">

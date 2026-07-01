@@ -84,7 +84,21 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-xs">
                             
                             <!-- Render conditionally based on request model type -->
-                            @if($basename === 'HealthRequest')
+                            @if($basename === 'CustomRequest')
+                                <div>
+                                    <span class="block text-slate-400 font-semibold uppercase tracking-wider mb-1">First Name</span>
+                                    <span class="text-slate-800 font-medium text-sm">{{ $req->first_name }}</span>
+                                </div>
+                                <div>
+                                    <span class="block text-slate-400 font-semibold uppercase tracking-wider mb-1">Last Name</span>
+                                    <span class="text-slate-800 font-medium text-sm">{{ $req->last_name }}</span>
+                                </div>
+                                <div class="sm:col-span-2">
+                                    <span class="block text-slate-400 font-semibold uppercase tracking-wider mb-1">Email Address</span>
+                                    <span class="text-slate-800 font-mono text-sm select-all">{{ $req->email }}</span>
+                                </div>
+
+                            @elseif($basename === 'HealthRequest')
                                 <div>
                                     <span class="block text-slate-400 font-semibold uppercase tracking-wider mb-1">First Name</span>
                                     <span class="text-slate-800 font-medium text-sm">{{ $req->first_name }}</span>

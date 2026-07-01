@@ -32,7 +32,18 @@ class KkProfileController extends Controller
             $limit = 15;
         }
 
-        $query = KkProfile::with(['purok', 'processedBy'])->latest();
+        $showArchive = $request->boolean('archive', false);
+
+        if ($showArchive) {
+            $query = KkProfile::withTrashed()
+                ->where(function($q) {
+                    $q->whereNotNull('deleted_at')
+                      ->orWhere('age', '>', 30);
+                })
+                ->with(['purok', 'processedBy'])->latest();
+        } else {
+            $query = KkProfile::where('age', '<=', 30)->with(['purok', 'processedBy'])->latest();
+        }
 
         // Search Filter
         if ($search) {
@@ -87,9 +98,14 @@ class KkProfileController extends Controller
             $statusFilter = 'all';
         }
 
-        $approvedCount = KkProfile::where('status', 'approved')->count();
-        $pendingCount = KkProfile::where('status', 'pending')->count();
-        $declinedCount = KkProfile::where('status', 'declined')->count();
+        $approvedCount = KkProfile::where('status', 'approved')->where('age', '<=', 30)->count();
+        $pendingCount = KkProfile::where('status', 'pending')->where('age', '<=', 30)->count();
+        $declinedCount = KkProfile::where('status', 'declined')->where('age', '<=', 30)->count();
+        $archivedCount = KkProfile::withTrashed()
+            ->where(function($q) {
+                $q->whereNotNull('deleted_at')
+                  ->orWhere('age', '>', 30);
+            })->count();
 
         if ($statusFilter !== 'all') {
             $query->where('status', $statusFilter);
@@ -130,7 +146,8 @@ class KkProfileController extends Controller
             'profiles', 'puroks', 'search', 'purokFilter', 'classFilter',
             'yearFilter', 'sexFilter', 'skVoterFilter', 'nationalVoterFilter',
             'lgbtqiaFilter', 'pwdFilter', 'limit', 'years', 'historyLogs',
-            'statusFilter', 'approvedCount', 'pendingCount', 'declinedCount'
+            'statusFilter', 'approvedCount', 'pendingCount', 'declinedCount',
+            'showArchive', 'archivedCount'
         ));
     }
 
@@ -413,5 +430,22 @@ class KkProfileController extends Controller
 
         return redirect()->route('dashboard.profiling.index')
             ->with('success', 'Katipunan ng Kabataan profile has been successfully deleted.');
+    }
+
+    /**
+     * Restore a deleted KK Profile.
+     */
+    public function restore($id)
+    {
+        $profile = KkProfile::onlyTrashed()->findOrFail($id);
+        $profile->restore();
+
+        ActivityLog::record('kk_profile_restored', $profile, [
+            'name' => $profile->full_name,
+            'email' => $profile->email,
+        ]);
+
+        return redirect()->route('dashboard.profiling.index', ['archive' => '1'])
+            ->with('success', 'Katipunan ng Kabataan profile has been successfully restored.');
     }
 }

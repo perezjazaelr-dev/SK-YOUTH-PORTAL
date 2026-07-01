@@ -25,6 +25,15 @@
 
         <style>
             [x-cloak] { display: none !important; }
+            .no-scrollbar::-webkit-scrollbar,
+            .scrollbar-none::-webkit-scrollbar {
+                display: none !important;
+            }
+            .no-scrollbar,
+            .scrollbar-none {
+                -ms-overflow-style: none !important;  /* IE and Edge */
+                scrollbar-width: none !important;  /* Firefox */
+            }
         </style>
     </head>
     <body class="bg-[#fefefe] dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col min-h-screen">
@@ -346,64 +355,70 @@
             @endunless
         </nav>
 
-        <!-- Flash Messages Block (Modal Style matching the 2nd picture) -->
+        <!-- Flash Messages Block (Modern Sleek Modal) -->
         @if (session('success') || session('error'))
-            <div x-data="{ showFlashModal: true }" x-show="showFlashModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" x-cloak>
-                <!-- Backdrop with blur -->
-                <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300" @click="showFlashModal = false"></div>
+            <div x-data="{ showFlashModal: true }" 
+                 x-show="showFlashModal" 
+                 class="fixed inset-0 z-50 flex items-center justify-center p-4" 
+                 x-cloak>
+                <!-- Backdrop with modern blur -->
+                <div class="fixed inset-0 bg-slate-950/60 backdrop-blur-md transition-opacity duration-300" 
+                     @click="showFlashModal = false"></div>
 
                 <!-- Card Container -->
-                <div class="relative bg-white rounded-[2rem] shadow-2xl max-w-[340px] w-full overflow-hidden border border-slate-100 transform transition-all duration-300 z-50 flex flex-col items-center pb-8"
+                <div class="relative bg-white dark:bg-slate-900 rounded-[2.25rem] shadow-2xl max-w-[360px] w-full overflow-hidden border border-slate-100 dark:border-slate-800/80 transform transition-all duration-300 z-50 p-8 flex flex-col items-center"
                      x-show="showFlashModal"
                      x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 scale-95"
-                     x-transition:enter-end="opacity-100 scale-100"
+                     x-transition:enter-start="opacity-0 translate-y-8 scale-95"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                      x-transition:leave="transition ease-in duration-200"
-                     x-transition:leave-start="opacity-100 scale-100"
-                     x-transition:leave-end="opacity-0 scale-95">
+                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                     x-transition:leave-end="opacity-0 translate-y-8 scale-95">
 
                     @if (session('success'))
-                        <!-- Top Half (Green header for success) -->
-                        <div class="w-full bg-[#10b981] flex items-center justify-center py-10 relative">
-                            <!-- Circular background overlay -->
-                            <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="4.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-                                </svg>
-                            </div>
+                        <!-- Success Icon Box -->
+                        <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/20 dark:border-emerald-500/30 shadow-lg shadow-emerald-500/5 relative mb-6">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            <span class="absolute inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 opacity-75 animate-ping -top-1 -right-1"></span>
                         </div>
 
-                        <!-- Bottom Half -->
-                        <div class="p-6 w-full flex flex-col items-center text-center space-y-3">
-                            <h3 class="text-xl font-bold text-slate-800 font-display">Success</h3>
-                            <p class="text-xs text-slate-500 font-semibold leading-relaxed px-2">
+                        <!-- Content -->
+                        <div class="w-full flex flex-col items-center text-center space-y-2 mb-6">
+                            <h3 class="text-xl font-bold text-slate-950 dark:text-white font-display tracking-tight">Success</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed px-1">
                                 {{ session('success') }}
                             </p>
                         </div>
+
+                        <!-- Action Button -->
+                        <button @click="showFlashModal = false" 
+                                class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 dark:bg-emerald-500 dark:hover:bg-emerald-400 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                            Okay
+                        </button>
                     @else
-                        <!-- Top Half (Red header for error) -->
-                        <div class="w-full bg-rose-500 flex items-center justify-center py-10 relative">
-                            <!-- Circular background overlay -->
-                            <div class="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" stroke-width="4.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </div>
+                        <!-- Error Icon Box -->
+                        <div class="w-16 h-16 rounded-2xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-500/20 dark:border-rose-500/30 shadow-lg shadow-rose-500/5 relative mb-6">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </div>
 
-                        <!-- Bottom Half -->
-                        <div class="p-6 w-full flex flex-col items-center text-center space-y-3">
-                            <h3 class="text-xl font-bold text-slate-800 font-display">Error</h3>
-                            <p class="text-xs text-slate-500 font-semibold leading-relaxed px-2">
+                        <!-- Content -->
+                        <div class="w-full flex flex-col items-center text-center space-y-2 mb-6">
+                            <h3 class="text-xl font-bold text-slate-955 dark:text-white font-display tracking-tight">Error</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed px-1">
                                 {{ session('error') }}
                             </p>
                         </div>
-                    @endif
 
-                    <!-- Okay Button -->
-                    <button @click="showFlashModal = false" class="mt-2 px-10 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider rounded-full shadow-md active:scale-95 transition-all duration-150 cursor-pointer min-w-[140px]">
-                        Okay
-                    </button>
+                        <!-- Action Button -->
+                        <button @click="showFlashModal = false" 
+                                class="w-full py-3 bg-rose-600 hover:bg-rose-500 dark:bg-rose-500 dark:hover:bg-rose-400 text-white font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-rose-500/20 hover:shadow-rose-500/35 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] transition-all duration-200 cursor-pointer">
+                            Close
+                        </button>
+                    @endif
                 </div>
             </div>
         @endif
