@@ -6,17 +6,17 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureAdminOrDpo
+class EnsureDpoClearance
 {
     /**
-     * Handle an incoming request.
+     * Allow DPO, Admin, and Superadmin access (PII clearance holders).
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isDpo())) {
+        if (auth()->check() && auth()->user()->hasPiiClearance()) {
             return $next($request);
         }
 
-        abort(403, 'Access Denied: Admin, Superadmin, or DPO privileges required.');
+        abort(403, 'Access Denied: DPO or Admin clearance required.');
     }
 }

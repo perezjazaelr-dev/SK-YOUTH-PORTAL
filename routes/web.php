@@ -6,12 +6,15 @@ use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\TransparencyPostController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\StructureManagementController;
-use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\DpoAuditLogController;
+use App\Http\Controllers\Admin\FormBuilderController;
 use App\Http\Controllers\Admin\CarouselSlideController;
 use App\Http\Controllers\Admin\SportsLeagueController;
 use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ConfirmationController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GovernanceController;
@@ -118,6 +121,8 @@ Route::middleware(['auth', 'admin.staff'])->group(function () {
     Route::get('/dashboard/requests', [DashboardController::class, 'requestsIndex'])->name('dashboard.requests.index');
     Route::get('/dashboard/requests/{type}/{id}', [DashboardController::class, 'show'])->name('dashboard.requests.show');
     Route::patch('/dashboard/requests/{type}/{id}/status/{status}', [DashboardController::class, 'updateStatus'])->name('dashboard.requests.status');
+    Route::post('/dashboard/requests/{type}/{id}/comments', [CommentController::class, 'store'])->name('dashboard.requests.comments.store');
+    Route::get('/dashboard/requests/{type}/{id}/comments/{comment}/attachment', [CommentController::class, 'downloadAttachment'])->name('dashboard.requests.comments.attachment');
     Route::get('/dashboard/export/{type}', [ExportController::class, 'export'])->name('dashboard.export');
     Route::get('/dashboard/calendar', [CalendarController::class, 'index'])->name('dashboard.calendar.index');
     Route::get('/dashboard/calendar/events', [CalendarController::class, 'events'])->name('dashboard.calendar.events');
@@ -181,6 +186,12 @@ Route::middleware(['auth', 'admin.dpo'])->group(function () {
     Route::delete('/admin/sports-league/{id}', [SportsLeagueController::class, 'destroy'])->name('admin.sports-league.destroy');
 });
 
+// DPO clearance actions (DPO, Admin, Superadmin)
+Route::middleware(['auth', 'dpo.clearance'])->group(function () {
+    Route::get('/admin/dpo/audit-logs', [DpoAuditLogController::class, 'index'])->name('admin.dpo.audit-logs');
+    Route::get('/admin/dpo/audit-export', [DpoAuditLogController::class, 'export'])->name('admin.dpo.audit-export');
+});
+
 // Superadmin-Only Actions (Middleware: auth, admin.only)
 Route::middleware(['auth', 'admin.only'])->group(function () {
     // User Management
@@ -210,6 +221,8 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::delete('/admin/structure/initiatives/{initiative}', [StructureManagementController::class, 'destroyInitiative'])->name('admin.structure.initiative.destroy');
     Route::post('/admin/structure/initiatives/{id}/restore', [StructureManagementController::class, 'restoreInitiative'])->name('admin.structure.initiative.restore');
     Route::delete('/admin/structure/initiatives/{id}/force-delete', [StructureManagementController::class, 'forceDeleteInitiative'])->name('admin.structure.initiative.force-delete');
+    Route::get('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'edit'])->name('admin.structure.form-builder.edit');
+    Route::put('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'update'])->name('admin.structure.form-builder.update');
 
     // System Audit Logs
     Route::get('/admin/logs', [AuditLogController::class, 'index'])->name('admin.logs.index');

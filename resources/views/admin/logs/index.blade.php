@@ -43,6 +43,7 @@
                 </div>
                 <h1 class="text-2xl font-black tracking-tight text-slate-800 font-display uppercase mt-1">System Audit Logs</h1>
                 <p class="text-xs text-slate-500 mt-1">Review activity trails of authentication events, user updates, structure edits, logo assets changes, and request lifecycles.</p>
+                @include('admin.logs.partials.dpo-export-modal')
             </div>
 
             <!-- Search & Filters Card -->

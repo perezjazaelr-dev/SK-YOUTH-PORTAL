@@ -87,8 +87,10 @@ class StructureManagementController extends Controller
             'custom_fields' => ['nullable', 'array'],
             'custom_fields.*.label' => ['required_with:custom_fields', 'string', 'max:255'],
             'custom_fields.*.name' => ['required_with:custom_fields', 'string', 'max:255', 'regex:/^[a-z0-9_]+$/'],
-            'custom_fields.*.type' => ['required_with:custom_fields', 'string', 'in:text,textarea,number,date'],
+            'custom_fields.*.type' => ['required_with:custom_fields', 'string', 'in:text,textarea,number,date,select,file'],
             'custom_fields.*.placeholder' => ['nullable', 'string', 'max:255'],
+            'custom_fields.*.options' => ['nullable', 'array'],
+            'custom_fields.*.options.*' => ['string', 'max:255'],
         ]);
 
         $customFields = [];
@@ -101,6 +103,9 @@ class StructureManagementController extends Controller
                     'type' => $field['type'],
                     'placeholder' => $field['placeholder'] ?? '',
                     'required' => $isRequired,
+                    'options' => ($field['type'] ?? '') === 'select'
+                        ? array_values(array_filter($field['options'] ?? []))
+                        : [],
                 ];
             }
         }
@@ -132,8 +137,10 @@ class StructureManagementController extends Controller
             'custom_fields' => ['nullable', 'array'],
             'custom_fields.*.label' => ['required_with:custom_fields', 'string', 'max:255'],
             'custom_fields.*.name' => ['required_with:custom_fields', 'string', 'max:255', 'regex:/^[a-z0-9_]+$/'],
-            'custom_fields.*.type' => ['required_with:custom_fields', 'string', 'in:text,textarea,number,date'],
+            'custom_fields.*.type' => ['required_with:custom_fields', 'string', 'in:text,textarea,number,date,select,file'],
             'custom_fields.*.placeholder' => ['nullable', 'string', 'max:255'],
+            'custom_fields.*.options' => ['nullable', 'array'],
+            'custom_fields.*.options.*' => ['string', 'max:255'],
         ]);
 
         $customFields = [];
@@ -146,6 +153,9 @@ class StructureManagementController extends Controller
                     'type' => $field['type'],
                     'placeholder' => $field['placeholder'] ?? '',
                     'required' => $isRequired,
+                    'options' => ($field['type'] ?? '') === 'select'
+                        ? array_values(array_filter($field['options'] ?? []))
+                        : [],
                 ];
             }
         }

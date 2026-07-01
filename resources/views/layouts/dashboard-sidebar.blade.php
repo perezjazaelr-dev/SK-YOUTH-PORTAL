@@ -77,6 +77,15 @@
             </a>
             @endif
 
+            <!-- DPO Audit Logs -->
+            @if(Auth::user()->hasPiiClearance() && !Auth::user()->isSuperAdmin())
+            <a href="{{ route('admin.dpo.audit-logs') }}"
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.dpo.*') ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+                <x-category-icon name="logs" class="w-4 h-4 shrink-0" />
+                <span class="leading-snug break-words">DPO Audit Logs</span>
+            </a>
+            @endif
+
             <!-- Audit Logs Link -->
             @if(Auth::user()->isSuperAdmin())
             <a href="{{ route('admin.logs.index') }}"

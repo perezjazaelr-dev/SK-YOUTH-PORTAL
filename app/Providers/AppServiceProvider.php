@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\CustomRequest;
 use App\Models\HealthRequest;
 use App\Models\MedicineRequest;
 use App\Models\SilidKarununganRequest;
@@ -42,6 +43,7 @@ class AppServiceProvider extends ServiceProvider
         MedicineRequest::observe(RequestObserver::class);
         SilidKarununganRequest::observe(RequestObserver::class);
         SportsRegistration::observe(RequestObserver::class);
+        CustomRequest::observe(RequestObserver::class);
 
         // Register system audit observers
         User::observe(SystemAuditObserver::class);

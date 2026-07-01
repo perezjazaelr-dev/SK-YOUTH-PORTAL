@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasComments;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class HealthRequest extends Model
 {
-    use HasFactory;
+    use HasComments, HasFactory;
 
     protected $fillable = [
         'first_name',
@@ -45,11 +46,7 @@ class HealthRequest extends Model
     protected static function booted(): void
     {
         static::created(function ($model) {
-            try {
-                \Illuminate\Support\Facades\Mail::to($model->email)->send(new \App\Mail\RequestReceivedMail($model));
-            } catch (\Exception $e) {
-                // Silently swallow mail exceptions so HTTP transaction succeeds
-            }
+            app(\App\Services\MailDispatchService::class)->queueRequestReceived($model);
         });
     }
 }

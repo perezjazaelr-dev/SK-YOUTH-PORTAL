@@ -298,6 +298,8 @@
 
                 <!-- Right 1 Col: Activity log feed -->
                 <div class="space-y-6">
+                    @include('dashboard.partials.comment-thread', ['comments' => $comments])
+
                     <div class="card space-y-4">
                         <div>
                             <span class="text-[9px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Historical Timeline</span>

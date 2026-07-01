@@ -12,3 +12,7 @@ Artisan::command('inspire', function () {
 Schedule::command('sk:archive-pending-requests --days=90')
     ->dailyAt('02:00')
     ->withoutOverlapping();
+
+Schedule::command('sk:generate-lgu-monthly-report')
+    ->monthlyOn(1, '06:00')
+    ->withoutOverlapping();

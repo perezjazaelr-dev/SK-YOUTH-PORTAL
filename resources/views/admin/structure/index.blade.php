@@ -20,7 +20,7 @@
     activeAdminTab: 'structure',
     showEditInitiative: false,
     editInitiative: { id: null, title: '', description: '', form_route: '', custom_fields: [], is_coming_soon: false, show_in_quick_forms: false },
-    addInitiative: { custom_fields: [] },
+    addInitiative: { title: '', description: '', custom_fields: [] },
     newCustomFields: [],
     openEditModal(initiative) {
         this.editInitiative = {
@@ -95,6 +95,11 @@
                                 class="transition duration-150 outline-none font-display font-black tracking-widest cursor-pointer">
                             System Management Guidelines
                         </button>
+                        <button @click="activeAdminTab = 'archive'"
+                                :class="activeAdminTab === 'archive' ? 'text-[#1e40af] border-b-2 border-[#1e40af] -mb-px pb-3' : 'text-slate-400 hover:text-[#1e40af] pb-3'"
+                                class="transition duration-150 outline-none font-display font-black tracking-widest cursor-pointer">
+                            Archive ({{ $archivedCommittees->count() + $archivedInitiatives->count() }})
+                        </button>
                     </div>
 
                     <!-- Bottom Filter Pills (Visible when structure tab is active) -->
@@ -154,6 +159,153 @@
                          </div>
                          <p class="text-[11px] text-slate-500 leading-relaxed">Data governance and masking supervisor. DPO has standard read access for structures, and is responsible for auditing masked personal identifiable information (PII) on public-facing exports and listings.</p>
                      </div>
+                 </div>
+            </div>
+
+            <!-- Archive tab content -->
+            <div x-show="activeAdminTab === 'archive'" 
+                 x-data="{ archiveSubTab: 'committees' }"
+                 x-transition:enter="transition ease-out duration-250"
+                 x-transition:enter-start="opacity-0 transform translate-y-2"
+                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                 class="card bg-white border border-slate-100 p-6 rounded-3xl space-y-6"
+                 x-cloak>
+                 
+                 <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-4 gap-4">
+                     <div>
+                         <span class="text-[9px] font-black text-[#1e40af] uppercase tracking-widest block font-display">Backups & Recovery</span>
+                         <h3 class="text-base font-bold text-slate-800 uppercase tracking-wide font-display">Soft-Deleted Structure Backups</h3>
+                         <p class="text-xs text-slate-500 leading-relaxed font-medium">Restore archived items back to the active structure, or permanently purge them.</p>
+                     </div>
+                     
+                     <!-- Sub tabs filter if committees or initiatives -->
+                     <div class="flex bg-slate-100 p-1 rounded-xl shrink-0 self-start sm:self-center">
+                         <button type="button" 
+                                 @click="archiveSubTab = 'committees'"
+                                 :class="archiveSubTab === 'committees' ? 'bg-white text-slate-850 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                                 class="px-3.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition cursor-pointer">
+                             Committees ({{ $archivedCommittees->count() }})
+                         </button>
+                         <button type="button" 
+                                 @click="archiveSubTab = 'initiatives'"
+                                 :class="archiveSubTab === 'initiatives' ? 'bg-white text-slate-850 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+                                 class="px-3.5 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition cursor-pointer">
+                             Initiatives/Projects ({{ $archivedInitiatives->count() }})
+                         </button>
+                     </div>
+                 </div>
+
+                 <!-- Archived Committees List -->
+                 <div x-show="archiveSubTab === 'committees'" class="space-y-4">
+                     @if($archivedCommittees->isEmpty())
+                         <div class="text-center py-10 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-xs text-slate-400">
+                             No archived committees found in backup files.
+                         </div>
+                     @else
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             @foreach($archivedCommittees as $archivedC)
+                                 <div class="p-4 border border-slate-200/60 rounded-2xl bg-slate-50/30 flex items-center justify-between">
+                                     <div class="min-w-0">
+                                         <h4 class="text-xs font-black text-slate-800 truncate">{{ $archivedC->name }}</h4>
+                                         <p class="text-[10px] font-mono text-slate-450 mt-0.5">{{ $archivedC->slug }}</p>
+                                     </div>
+                                     <div class="flex items-center space-x-2 shrink-0">
+                                         <!-- Restore Committee -->
+                                         <form method="POST" action="{{ route('admin.structure.committee.restore', $archivedC->id) }}">
+                                             @csrf
+                                             <button type="submit" class="btn-success btn-xs px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wide flex items-center space-x-1">
+                                                 <span>Restore</span>
+                                             </button>
+                                         </form>
+                                         <!-- Force Delete Committee -->
+                                         <x-alert-dialog>
+                                             <x-slot:trigger>
+                                                 <button type="button" class="btn-danger btn-xs px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wide">
+                                                     Delete
+                                                 </button>
+                                             </x-slot:trigger>
+                                             <x-slot:icon>
+                                                 <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                                 </svg>
+                                             </x-slot:icon>
+                                             <x-slot:title>Permanently Delete Committee</x-slot:title>
+                                             <x-slot:description>
+                                                 Are you sure you want to permanently delete "{{ $archivedC->name }}"? This will purge the committee and all its child initiatives from backups. This action is irreversible.
+                                             </x-slot:description>
+                                             <x-slot:footer>
+                                                 <button type="button" @click="open = false" class="btn-outline text-xs py-2 px-4">Cancel</button>
+                                                 <form method="POST" action="{{ route('admin.structure.committee.force-delete', $archivedC->id) }}" class="inline">
+                                                     @csrf
+                                                     @method('DELETE')
+                                                     <button type="submit" class="btn-danger py-2 text-xs">Purge Permanently</button>
+                                                 </form>
+                                             </x-slot:footer>
+                                         </x-alert-dialog>
+                                     </div>
+                                 </div>
+                             @endforeach
+                         </div>
+                     @endif
+                 </div>
+
+                 <!-- Archived Initiatives List -->
+                 <div x-show="archiveSubTab === 'initiatives'" class="space-y-4">
+                     @if($archivedInitiatives->isEmpty())
+                         <div class="text-center py-10 border border-dashed border-slate-200 rounded-2xl bg-slate-50/50 text-xs text-slate-400">
+                             No archived initiatives or projects found in backup files.
+                         </div>
+                     @else
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                             @foreach($archivedInitiatives as $archivedI)
+                                     <div class="p-4 border border-slate-200/60 rounded-2xl bg-slate-50/30 flex items-center justify-between">
+                                         <div class="min-w-0 pr-4">
+                                             <h4 class="text-xs font-black text-slate-800 truncate" title="{{ $archivedI->title }}">{{ $archivedI->title }}</h4>
+                                             <p class="text-[10px] text-slate-450 mt-0.5 truncate">{{ $archivedI->description }}</p>
+                                             @if($archivedI->committee)
+                                                 <span class="inline-block mt-1 px-1.5 py-0.5 bg-slate-100 border border-slate-200/40 text-[8px] font-extrabold uppercase rounded text-slate-600">
+                                                     {{ $archivedI->committee->name }}
+                                                 </span>
+                                             @endif
+                                         </div>
+                                         <div class="flex items-center space-x-2 shrink-0">
+                                             <!-- Restore Initiative -->
+                                             <form method="POST" action="{{ route('admin.structure.initiative.restore', $archivedI->id) }}">
+                                                 @csrf
+                                                 <button type="submit" class="btn-success btn-xs px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wide">
+                                                     Restore
+                                                 </button>
+                                             </form>
+                                             <!-- Force Delete Initiative -->
+                                             <x-alert-dialog>
+                                                 <x-slot:trigger>
+                                                     <button type="button" class="btn-danger btn-xs px-2.5 py-1.5 text-[9px] font-bold uppercase tracking-wide">
+                                                         Delete
+                                                     </button>
+                                                 </x-slot:trigger>
+                                                 <x-slot:icon>
+                                                     <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                                     </svg>
+                                                 </x-slot:icon>
+                                                 <x-slot:title>Permanently Delete Initiative</x-slot:title>
+                                                 <x-slot:description>
+                                                     Are you sure you want to permanently delete "{{ $archivedI->title }}"? This will purge the initiative and all its accomplishment reports from backups. This action is irreversible.
+                                                 </x-slot:description>
+                                                 <x-slot:footer>
+                                                     <button type="button" @click="open = false" class="btn-outline text-xs py-2 px-4">Cancel</button>
+                                                     <form method="POST" action="{{ route('admin.structure.initiative.force-delete', $archivedI->id) }}" class="inline">
+                                                         @csrf
+                                                         @method('DELETE')
+                                                         <button type="submit" class="btn-danger py-2 text-xs">Purge Permanently</button>
+                                                     </form>
+                                                 </x-slot:footer>
+                                             </x-alert-dialog>
+                                         </div>
+                                     </div>
+                             @endforeach
+                         </div>
+                     @endif
                  </div>
             </div>
 
@@ -302,6 +454,9 @@
                              x-transition:leave-end="opacity-0 transform -translate-y-2"
                              class="card bg-slate-50 border border-slate-200/60 p-5 rounded-2xl shadow-inner-sm"
                              x-cloak>
+                            <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+
+                            {{-- Left Column: Form Builder --}}
                             <form method="POST" action="{{ route('admin.structure.initiative.store') }}" class="space-y-4">
                                 @csrf
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -433,6 +588,99 @@
 
                                 <button type="submit" class="btn-primary text-xs w-full justify-center py-2.5">Add Initiative</button>
                             </form>
+
+                            {{-- Right Column: Live Form Preview --}}
+                            <div class="sticky top-4 space-y-3">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-[9px] font-black text-[#1e40af] uppercase tracking-widest font-display">Live Preview</span>
+                                    <span class="inline-flex items-center space-x-1.5 px-2 py-0.5 bg-[#1e40af] text-white text-[8px] font-bold uppercase rounded-full tracking-wider">
+                                        <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse inline-block"></span>
+                                        <span>Live</span>
+                                    </span>
+                                </div>
+
+                                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                                    {{-- Mock form card header --}}
+                                    <div class="bg-gradient-to-r from-[#1e40af] to-blue-400 px-5 py-4">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                            </div>
+                                            <div class="min-w-0 flex-1">
+                                                <p x-text="addInitiative.title || 'Initiative Title'" class="text-xs font-black text-white uppercase tracking-wide truncate leading-tight"></p>
+                                                <p x-text="addInitiative.description || 'Short description will appear here...'" class="text-[10px] text-white/75 mt-1 leading-relaxed line-clamp-2"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Mock form body --}}
+                                    <div class="p-5 space-y-4">
+                                        {{-- Standard fields always present --}}
+                                        <div>
+                                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-3">Standard Fields (Always Included)</span>
+                                            <div class="grid grid-cols-2 gap-3">
+                                                <div class="space-y-1">
+                                                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider">First Name <span class="text-rose-500">*</span></label>
+                                                    <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-400 italic">e.g. Juan</div>
+                                                </div>
+                                                <div class="space-y-1">
+                                                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider">Last Name <span class="text-rose-500">*</span></label>
+                                                    <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-400 italic">e.g. Dela Cruz</div>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-1 mt-3">
+                                                <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider">Email Address <span class="text-rose-500">*</span></label>
+                                                <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-400 italic">e.g. juan@email.com</div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Custom fields preview (reactive) --}}
+                                        <div x-show="addInitiative.custom_fields.length > 0" class="space-y-3 pt-3 border-t border-slate-100">
+                                            <span class="text-[9px] font-black text-[#1e40af] uppercase tracking-widest block">Additional Information Required</span>
+                                            <template x-for="(field, idx) in addInitiative.custom_fields" :key="idx">
+                                                <div class="space-y-1">
+                                                    <label class="block text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                                                        <span x-text="field.label || 'Untitled Field'"></span>
+                                                        <span x-show="field.required" class="text-rose-500 ml-0.5">*</span>
+                                                    </label>
+                                                    <template x-if="field.type === 'textarea'">
+                                                        <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-400 italic h-14 flex items-start">
+                                                            <span x-text="field.placeholder || 'Enter text here...'"></span>
+                                                        </div>
+                                                    </template>
+                                                    <template x-if="field.type !== 'textarea'">
+                                                        <div class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-[10px] text-slate-400 italic flex items-center justify-between">
+                                                            <span x-text="field.placeholder || (field.type === 'date' ? 'MM / DD / YYYY' : field.type === 'number' ? '0' : 'Enter text here...')"></span>
+                                                            <template x-if="field.type === 'date'">
+                                                                <svg class="w-3 h-3 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                                            </template>
+                                                            <template x-if="field.type === 'number'">
+                                                                <span class="text-slate-300 text-[9px] shrink-0 font-mono">123</span>
+                                                            </template>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        {{-- Empty custom fields state --}}
+                                        <div x-show="addInitiative.custom_fields.length === 0" class="text-center py-3 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                                            <p class="text-[9px] text-slate-400 italic">No custom fields added yet — add fields to preview them here</p>
+                                        </div>
+
+                                        {{-- Submit button preview (non-interactive) --}}
+                                        <div class="pt-1">
+                                            <div class="w-full py-2.5 px-4 bg-[#1e40af]/90 text-white text-[10px] font-bold uppercase tracking-wider rounded-xl text-center cursor-not-allowed select-none">
+                                                Submit Request
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="text-[9px] text-slate-400 text-center italic leading-relaxed">Preview updates in real-time as you configure fields.</p>
+                            </div>{{-- end right preview column --}}
+
+                            </div>{{-- end xl:grid-cols-2 --}}
                         </div>
                     @endif
 
@@ -479,6 +727,15 @@
                                                         </div>
                                                         @if(Auth::user()->isAdmin())
                                                             <div class="flex items-center space-x-1 shrink-0">
+                                                                @php
+                                                                    $predefinedRoutes = ['forms.health.create','forms.mental-health.create','forms.medicine.create','forms.silid.create','forms.sports.create'];
+                                                                    $isCustomInitiative = !$initiative->form_route || !in_array($initiative->form_route, $predefinedRoutes);
+                                                                @endphp
+                                                                @if($isCustomInitiative)
+                                                                <a href="{{ route('admin.structure.form-builder.edit', $initiative) }}" class="p-2 bg-violet-50 hover:bg-violet-100 text-violet-700 hover:text-violet-900 rounded-xl transition active:scale-90" title="Form Builder">
+                                                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path></svg>
+                                                                </a>
+                                                                @endif
                                                                 <button type="button" @click="openEditModal(@js(['id' => $initiative->id, 'title' => $initiative->title, 'description' => $initiative->description, 'form_route' => $initiative->form_route ?? '', 'is_coming_soon' => $initiative->is_coming_soon, 'show_in_quick_forms' => $initiative->show_in_quick_forms, 'custom_fields' => $initiative->custom_fields ?? []]))" class="p-2 bg-blue-50 hover:bg-blue-100 text-[#1e40af] hover:text-blue-800 rounded-xl transition active:scale-90 cursor-pointer mr-1" title="Edit Initiative" aria-label="Edit {{ $initiative->title }}">
                                                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -556,7 +813,7 @@
         <div class="fixed inset-0 bg-slate-950/45 backdrop-blur-sm transition-opacity" @click="showEditInitiative = false"></div>
 
         <div class="flex min-h-screen items-center justify-center p-4">
-            <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-100 max-w-2xl w-full relative z-10 p-6 sm:p-8 space-y-6 max-h-[90vh] flex flex-col"
+            <div class="bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-100 max-w-5xl w-full relative z-10 p-6 sm:p-8 space-y-4 max-h-[90vh] flex flex-col"
                  @click.stop>
                  
                  <div class="flex justify-between items-center pb-3 border-b border-slate-100 shrink-0">

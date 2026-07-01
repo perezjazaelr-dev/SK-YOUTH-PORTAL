@@ -7,15 +7,17 @@ use App\Models\SportsRegistration;
 use App\Models\User;
 use App\Models\Notification;
 use App\Models\ActivityLog;
-use App\Mail\StatusChangedMail;
 use App\Helpers\PrivacyHelper;
+use App\Services\MailDispatchService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Mail;
 
 class SportsLeagueController extends Controller
 {
+    public function __construct(
+        private readonly MailDispatchService $mailDispatch
+    ) {}
     /**
      * Display a listing of sports registrations.
      */
@@ -126,11 +128,7 @@ class SportsLeagueController extends Controller
                 ]);
             }
 
-            try {
-                Mail::to($req->email)->send(new StatusChangedMail($req));
-            } catch (\Exception $e) {
-                // Silently swallow mail exceptions
-            }
+            $this->mailDispatch->queueStatusChanged($req);
         }
 
         $currentUser = auth()->user();
@@ -183,7 +181,7 @@ class SportsLeagueController extends Controller
         }
 
         try {
-            Mail::to($req->email)->send(new StatusChangedMail($req));
+            $this->mailDispatch->queueStatusChanged($req);
         } catch (\Exception $e) {
             // Silently swallow
         }
