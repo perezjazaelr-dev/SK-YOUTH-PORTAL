@@ -41,7 +41,7 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">
-                    <button type="button" @click="exportOpen = false" class="px-4 py-2 rounded-xl text-[11px] font-bold uppercase text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition">Cancel</button>
+                    <button type="button" @click="exportOpen = false" class="px-4 py-2 rounded-xl text-[11px] font-bold uppercase text-slate-500 hover:bg-slate-50 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white transition">Cancel</button>
                     <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black uppercase tracking-wider transition">Download CSV</button>
                 </div>
             </form>

@@ -17,7 +17,7 @@
         <nav class="space-y-1.5">
             <!-- Dashboard Link -->
             <a href="{{ route('dashboard.index') }}"
-               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.index') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.index') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <div class="flex items-center gap-3 min-w-0">
                     <x-category-icon name="dashboard" class="w-4 h-4 shrink-0" />
                     <span class="leading-snug break-words">Dashboard</span>
@@ -26,7 +26,7 @@
 
             <!-- Service Requests Link with pending requests count badge -->
             <a href="{{ route('dashboard.requests.index') }}"
-               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.requests.index') || request()->routeIs('dashboard.requests.show') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.requests.index') || request()->routeIs('dashboard.requests.show') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <div class="flex items-center gap-3 min-w-0">
                     <x-category-icon name="users" class="w-4 h-4 shrink-0" />
                     <span class="leading-snug break-words">Service Requests</span>
@@ -38,7 +38,7 @@
 
             <!-- Profiling List Link -->
             <a href="{{ route('dashboard.profiling.index') }}"
-               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.profiling.index') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center justify-between w-full px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.profiling.index') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <div class="flex items-center gap-3 min-w-0">
                     <x-category-icon name="logs" class="w-4 h-4 shrink-0" />
                     <span class="leading-snug break-words">Profiling List</span>
@@ -47,14 +47,14 @@
 
             <!-- Master Calendar Link -->
             <a href="{{ route('dashboard.calendar.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.calendar.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('dashboard.calendar.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <x-category-icon name="sports" class="w-4 h-4 shrink-0" />
                 <span class="leading-snug break-words">Master Calendar</span>
             </a>
 
             <!-- Sports League Link -->
             <a href="{{ route('admin.sports-league.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.sports-league.*') ? 'bg-blue-50 dark:bg-blue-955/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.sports-league.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 13a4 4 0 100-8 4 4 0 000 8z"></path></svg>
                 <span class="leading-snug break-words">Sports League</span>
             </a>
@@ -62,7 +62,7 @@
             <!-- Reports Link -->
             @if(Route::has('admin.reports.index') && Auth::user()->isAdmin())
             <a href="{{ route('admin.reports.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.reports.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <x-category-icon name="education" class="w-4 h-4 shrink-0" />
                 <span class="leading-snug break-words">Reports</span>
             </a>
@@ -71,7 +71,7 @@
             <!-- Portal Structure Link -->
             @if(Auth::user()->isSuperAdmin())
             <a href="{{ route('admin.structure.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.structure.*') ? 'bg-blue-50 dark:bg-blue-955/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.structure.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <x-category-icon name="governance" class="w-4 h-4 shrink-0" />
                 <span class="leading-snug break-words">Portal Structure</span>
             </a>
@@ -80,7 +80,7 @@
             <!-- Audit Logs Link -->
             @if(Auth::user()->isSuperAdmin())
             <a href="{{ route('admin.logs.index') }}"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.logs.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.logs.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                 <x-category-icon name="logs" class="w-4 h-4 shrink-0" />
                 <span class="leading-snug break-words">Audit Logs</span>
             </a>
@@ -90,40 +90,40 @@
             @if(Auth::user()->isAdmin())
             <div x-data="{ isCommunityBoardOpen: {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.officials.*') || request()->routeIs('admin.transparency.*') || request()->routeIs('admin.partners.*') || request()->routeIs('admin.carousel.*') ? 'true' : 'false' }} }" class="space-y-1">
                 <button
-                    class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.officials.*') || request()->routeIs('admin.transparency.*') || request()->routeIs('admin.partners.*') || request()->routeIs('admin.carousel.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}"
+                    class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.news.*') || request()->routeIs('admin.officials.*') || request()->routeIs('admin.transparency.*') || request()->routeIs('admin.partners.*') || request()->routeIs('admin.carousel.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}"
                     @click="isCommunityBoardOpen = !isCommunityBoardOpen"
                     :aria-expanded="isCommunityBoardOpen"
                 >
                     <div class="flex items-center min-w-0">
                         <span class="leading-snug break-words">Community Board</span>
                     </div>
-                    <svg xmlns="http://www.w3.org/2500/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 shrink-0 transition-transform duration-200" :class="{ 'rotate-180': isCommunityBoardOpen }">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': isCommunityBoardOpen }">
                         <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                     </svg>
                 </button>
 
                 <div x-show="isCommunityBoardOpen" x-collapse class="pl-4 sm:pl-6 space-y-1" x-cloak>
                     <a href="{{ route('admin.news.index') }}"
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.news.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.news.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <x-category-icon name="logs" class="w-4 h-4 shrink-0" />
                         <span class="leading-snug break-words">News Articles</span>
                     </a>
 
                     <a href="{{ route('admin.transparency.index') }}"
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.transparency.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.transparency.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <x-category-icon name="governance" class="w-4 h-4 shrink-0" />
                         <span class="leading-snug break-words">Transparency Board</span>
                     </a>
 
                     <a href="{{ route('admin.officials.index') }}"
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.officials.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.officials.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <x-category-icon name="users" class="w-4 h-4 shrink-0" />
                         <span class="leading-snug break-words">SK Officials</span>
                     </a>
 
                     @if(Route::has('admin.partners.index') && Auth::user()->isSuperAdmin())
                     <a href="{{ route('admin.partners.index') }}"
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.partners.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.partners.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <x-category-icon name="peace-building" class="w-4 h-4 shrink-0" />
                         <span class="leading-snug break-words">Partnerships</span>
                     </a>
@@ -131,7 +131,7 @@
 
                     @if(Auth::user()->isSuperAdmin())
                     <a href="{{ route('admin.carousel.index') }}"
-                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.carousel.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                       class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.carousel.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <x-category-icon name="carousel" class="w-4 h-4 shrink-0" />
                         <span class="leading-snug break-words">Hero Slides</span>
                     </a>
@@ -144,7 +144,7 @@
                 <!-- Collapsible Settings Dropdown for Superadmin -->
                 <div x-data="{ isOpened: {{ request()->routeIs('admin.users.*') || request()->routeIs('profile.edit') ? 'true' : 'false' }} }" class="space-y-1">
                     <button
-                        class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.users.*') || request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}"
+                        class="w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.users.*') || request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}"
                         @click="isOpened = !isOpened"
                         :aria-expanded="isOpened"
                     >
@@ -164,7 +164,7 @@
                     <div x-show="isOpened" x-collapse class="pl-4 sm:pl-6 space-y-1" x-cloak>
                         <!-- User Accounts -->
                         <a href="{{ route('admin.users.index') }}"
-                           class="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 dark:bg-blue-955/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                           class="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('admin.users.*') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                             <div class="flex items-center gap-3 min-w-0">
                                 <x-category-icon name="users" class="w-4 h-4 shrink-0" />
                                 <span class="leading-snug break-words">Account Management</span>
@@ -176,7 +176,7 @@
 
                         <!-- My Profile -->
                         <a href="{{ route('profile.edit') }}"
-                           class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-955/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                           class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                             <x-category-icon name="profile" class="w-4 h-4 shrink-0" />
                             <span class="leading-snug break-words">My Profile</span>
                         </a>
@@ -185,7 +185,7 @@
             @else
                 <!-- Standalone My Profile Link for Admin / Staff -->
                 <a href="{{ route('profile.edit') }}"
-                   class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white' }}">
+                   class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('profile.edit') ? 'bg-blue-50 dark:bg-blue-900/30 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                     <x-category-icon name="profile" class="w-4 h-4 shrink-0" />
                     <span class="leading-snug break-words">My Profile</span>
                 </a>
@@ -193,7 +193,7 @@
 
             <!-- View Website Link -->
             <a href="/"
-               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-855 hover:text-slate-900 dark:hover:text-white">
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white">
                 <x-category-icon name="website" class="w-4 h-4 shrink-0" />
                 <span class="leading-snug break-words">View Website</span>
             </a>
@@ -203,7 +203,7 @@
     <!-- Fixed User Profile Footer -->
     <div class="px-4 sm:px-6 py-6 sm:py-8 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0 relative" x-data="{ isProfileActive: false }">
         <div class="flex items-center gap-3 min-w-0">
-            <div class="w-9 h-9 rounded-full bg-[#1e40af] dark:bg-blue-955 text-white dark:text-blue-300 font-extrabold text-xs flex items-center justify-center font-display shadow-sm shrink-0">
+            <div class="w-9 h-9 rounded-full bg-[#1e40af] dark:bg-blue-900 text-white dark:text-blue-300 font-extrabold text-xs flex items-center justify-center font-display shadow-sm shrink-0">
                 {{ substr(Auth::user()->name, 0, 1) }}
             </div>
             <div class="min-w-0">
