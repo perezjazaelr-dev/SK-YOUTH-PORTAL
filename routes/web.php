@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\PartnerController;
 use App\Http\Controllers\Admin\TransparencyPostController;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Admin\StructureManagementController;
-use App\Http\Controllers\Admin\DpoAuditLogController;
+use App\Http\Controllers\Admin\UnifiedAuditLogController;
 use App\Http\Controllers\Admin\FormBuilderController;
 use App\Http\Controllers\Admin\CarouselSlideController;
 use App\Http\Controllers\Admin\SportsLeagueController;
@@ -14,7 +14,6 @@ use App\Http\Controllers\Admin\NewsController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ConfirmationController;
-use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GovernanceController;
@@ -186,11 +185,7 @@ Route::middleware(['auth', 'admin.dpo'])->group(function () {
     Route::delete('/admin/sports-league/{id}', [SportsLeagueController::class, 'destroy'])->name('admin.sports-league.destroy');
 });
 
-// DPO clearance actions (DPO, Admin, Superadmin)
-Route::middleware(['auth', 'dpo.clearance'])->group(function () {
-    Route::get('/admin/dpo/audit-logs', [DpoAuditLogController::class, 'index'])->name('admin.dpo.audit-logs');
-    Route::get('/admin/dpo/audit-export', [DpoAuditLogController::class, 'export'])->name('admin.dpo.audit-export');
-});
+
 
 // Superadmin-Only Actions (Middleware: auth, admin.only)
 Route::middleware(['auth', 'admin.only'])->group(function () {
@@ -224,8 +219,9 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::get('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'edit'])->name('admin.structure.form-builder.edit');
     Route::put('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'update'])->name('admin.structure.form-builder.update');
 
-    // System Audit Logs
-    Route::get('/admin/logs', [AuditLogController::class, 'index'])->name('admin.logs.index');
+    // Unified Audit Logs
+    Route::get('/admin/logs', [UnifiedAuditLogController::class, 'index'])->name('admin.logs.index');
+    Route::get('/admin/logs/export', [UnifiedAuditLogController::class, 'export'])->name('admin.logs.export');
 
     // Hero Carousel management
     Route::get('/admin/carousel', [CarouselSlideController::class, 'index'])->name('admin.carousel.index');

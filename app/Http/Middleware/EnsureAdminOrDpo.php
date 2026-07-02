@@ -11,12 +11,16 @@ class EnsureAdminOrDpo
     /**
      * Handle an incoming request.
      */
+    // Sa app/Http/Middleware/EnsureAdminOrDpo.php
+
     public function handle(Request $request, Closure $next): Response
     {
-        if (auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isDpo())) {
+        // Dati: admin o dpo
+        // Ngayon: Superadmin na lang
+        if ($request->user() && $request->user()->role === 'superadmin') {
             return $next($request);
         }
 
-        abort(403, 'Access Denied: Admin, Superadmin, or DPO privileges required.');
+        abort(403, 'Unauthorized access.');
     }
 }

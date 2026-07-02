@@ -15,7 +15,8 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Filter activity logs by date range and download as CSV for DPO review.</p>
             </div>
 
-            <form method="GET" action="{{ route('admin.dpo.audit-export') }}" class="space-y-4">
+            <form method="GET" action="{{ route('admin.logs.export') }}" class="space-y-4">
+                <input type="hidden" name="type" value="{{ $type ?? 'system' }}">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="text-[10px] font-black uppercase text-slate-400 mb-1.5 block">Date From</label>

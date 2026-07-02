@@ -29,26 +29,51 @@
                 <div class="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider">
                     <a href="{{ route('dashboard.index') }}" class="text-slate-400 hover:text-[#1e40af] transition duration-150">Dashboard</a>
                     <span class="text-slate-300">/</span>
-                    <span class="text-slate-800">System Audit Logs</span>
+                    <span class="text-slate-855">{{ $type === 'dpo' ? 'DPO Audit Logs' : 'System Audit Logs' }}</span>
                 </div>
             </div>
 
             <!-- Page Title -->
             <div class="space-y-1">
                 <div class="flex items-center space-x-2">
-                    <span class="text-[10px] font-black text-[#1e40af] uppercase tracking-widest block font-display">System Integrity</span>
-                    <span class="px-2 py-0.5 bg-blue-50 text-[#1e40af] rounded-md text-[9px] font-bold uppercase font-mono">
+                    <span class="text-[10px] font-black {{ $type === 'dpo' ? 'text-emerald-600' : 'text-[#1e40af]' }} uppercase tracking-widest block font-display">
+                        {{ $type === 'dpo' ? 'Data Privacy Office' : 'System Integrity' }}
+                    </span>
+                    <span class="px-2 py-0.5 {{ $type === 'dpo' ? 'bg-emerald-50 text-emerald-700' : 'bg-blue-50 text-[#1e40af]' }} rounded-md text-[9px] font-bold uppercase font-mono">
                         {{ $logs->total() }} Log Entries
                     </span>
                 </div>
-                <h1 class="text-2xl font-black tracking-tight text-slate-800 font-display uppercase mt-1">System Audit Logs</h1>
-                <p class="text-xs text-slate-500 mt-1">Review activity trails of authentication events, user updates, structure edits, logo assets changes, and request lifecycles.</p>
-                @include('admin.logs.partials.dpo-export-modal')
+                <h1 class="text-2xl font-black tracking-tight text-slate-800 font-display uppercase mt-1">
+                    {{ $type === 'dpo' ? 'DPO Audit Logs' : 'System Audit Logs' }}
+                </h1>
+                <p class="text-xs text-slate-500 mt-1">
+                    {{ $type === 'dpo' 
+                        ? 'Review and export system activity logs filtered specifically for compliance and data privacy oversight (sensitive PII data access).' 
+                        : 'Review activity trails of authentication events, user updates, structure edits, logo assets changes, and request lifecycles.' }}
+                </p>
+                <div class="pt-2">
+                    @include('admin.logs.partials.dpo-export-modal')
+                </div>
+            </div>
+
+            <!-- Tabbed UI -->
+            <div class="border-b border-slate-200">
+                <nav class="flex space-x-6" aria-label="Tabs">
+                    <a href="{{ route('admin.logs.index', ['type' => 'system']) }}" 
+                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all {{ $type === 'system' ? 'border-[#1e40af] text-[#1e45af]' : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300' }}">
+                        System Logs
+                    </a>
+                    <a href="{{ route('admin.logs.index', ['type' => 'dpo']) }}" 
+                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all {{ $type === 'dpo' ? 'border-emerald-600 text-emerald-600' : 'border-transparent text-slate-400 hover:text-slate-600 hover:border-slate-300' }}">
+                        DPO Logs
+                    </a>
+                </nav>
             </div>
 
             <!-- Search & Filters Card -->
             <div class="card p-6 bg-white border border-slate-100 rounded-3xl shadow-sm">
                 <form id="filterForm" method="GET" action="{{ route('admin.logs.index') }}" class="space-y-4">
+                    <input type="hidden" name="type" value="{{ $type }}">
                     <!-- Row 1: Search, Action, Year -->
                     <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                         <!-- Search Box (Col span 6) -->
@@ -125,7 +150,7 @@
 
                             <!-- Reset Filter Link -->
                             @if($search || $actionFilter || $yearFilter || $limit != 20)
-                                <a href="{{ route('admin.logs.index') }}" 
+                                <a href="{{ route('admin.logs.index', ['type' => $type]) }}" 
                                    class="inline-flex items-center text-[11px] font-bold text-slate-450 hover:text-slate-650 transition space-x-1 select-none cursor-pointer pl-2 py-1.5"
                                 >
                                     <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H18v3.582"></path></svg>

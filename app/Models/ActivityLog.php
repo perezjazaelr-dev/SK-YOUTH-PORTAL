@@ -55,4 +55,15 @@ class ActivityLog extends Model
             'ip_address' => request()->ip(),
         ]);
     }
+
+    /**
+     * Scope a query to only include records related to sensitive data access (DPO).
+     */
+    public function scopeDpo($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('action', 'like', '%pii%')
+              ->orWhere('payload', 'like', '%pii%');
+        });
+    }
 }

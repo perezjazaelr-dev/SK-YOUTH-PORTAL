@@ -116,7 +116,7 @@ class GenerateLguMonthlyReport extends Command
             return collect([$email]);
         }
 
-        return User::whereIn('role', ['superadmin', 'admin', 'dpo'])
+        return User::where('role', 'superadmin')
             ->where('is_approved', true)
             ->pluck('email');
     }

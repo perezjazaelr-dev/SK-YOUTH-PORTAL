@@ -114,4 +114,48 @@ class AuditLogTest extends TestCase
             'subject_id' => $partner->id
         ]);
     }
+
+    /**
+     * Test superadmin can view unified audit logs with type dpo.
+     */
+    public function test_superadmin_can_view_dpo_audit_logs(): void
+    {
+        $superadmin = User::factory()->create(['role' => 'superadmin']);
+
+        // Create some normal logs and some PII logs
+        $normalUser = User::factory()->create(); // creates user_created activity log
+        
+        // Let's create an activity log with 'pii' keyword
+        ActivityLog::create([
+            'user_id' => $superadmin->id,
+            'action' => 'pii_accessed',
+            'subject_type' => User::class,
+            'subject_id' => $normalUser->id,
+            'ip_address' => '127.0.0.1',
+            'payload' => ['details' => 'Accessed sensitive data'],
+        ]);
+
+        $response = $this->actingAs($superadmin)->get('/admin/logs?type=dpo');
+
+        $response->assertStatus(200);
+        $response->assertSee('DPO Audit Logs');
+        $response->assertSee('pii accessed');
+    }
+
+    /**
+     * Test superadmin can export DPO audit logs as CSV.
+     */
+    public function test_superadmin_can_export_dpo_audit_logs(): void
+    {
+        $superadmin = User::factory()->create(['role' => 'superadmin']);
+
+        $response = $this->actingAs($superadmin)->get(route('admin.logs.export', [
+            'type' => 'dpo',
+            'date_from' => now()->subDay()->toDateString(),
+            'date_to' => now()->addDay()->toDateString(),
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+    }
 }
