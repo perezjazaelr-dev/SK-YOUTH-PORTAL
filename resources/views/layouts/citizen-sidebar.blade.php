@@ -29,6 +29,13 @@
                 <span class="leading-snug break-words">Sports League</span>
             </a>
 
+            <!-- SKONSULTA Link -->
+            <a href="{{ route('skonsulta.index') }}"
+               class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('skonsulta.*') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">
+                <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <span class="leading-snug break-words">SKONSULTA</span>
+            </a>
+
             <!-- KK Self Profiling Link -->
             <a href="{{ route('profile.profiling.create') }}"
                class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider transition {{ request()->routeIs('profile.profiling.create') ? 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 hover:text-slate-900 dark:hover:text-white' }}">

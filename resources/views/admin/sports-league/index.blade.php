@@ -30,6 +30,12 @@
                     <span class="text-[9px] font-black text-[#1e40af] uppercase tracking-widest block font-display">SK Sports Committee</span>
                     <h1 class="text-xl font-black text-slate-800 font-display uppercase tracking-tight">Sports League Console</h1>
                 </div>
+                <div class="flex items-center gap-2">
+                    <a href="{{ route('admin.sports-league.form-builder.create') }}" 
+                       class="inline-flex items-center px-4 py-2.5 rounded-xl bg-emerald-650 hover:bg-emerald-700 text-white text-[10px] font-black uppercase tracking-wider transition active:scale-95 shadow-sm">
+                        Configure Registration Form
+                    </a>
+                </div>
             </div>
 
             <!-- Table Search & Status Filter Bar -->

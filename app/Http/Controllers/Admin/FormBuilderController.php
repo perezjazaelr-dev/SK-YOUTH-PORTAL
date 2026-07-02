@@ -19,6 +19,7 @@ class FormBuilderController extends Controller
 
         return view('admin.structure.form-builder', [
             'initiative' => $initiative->load('committee'),
+            'isSportsBuilder' => false
         ]);
     }
 

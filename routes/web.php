@@ -46,6 +46,12 @@ Route::get('/projects', function() {
     ]);
 })->name('projects.index');
 
+// Consultations anonymous tracking & public views
+Route::get('/skonsulta', [App\Http\Controllers\Admin\ConsultationController::class, 'showForm'])->name('skonsulta.index');
+Route::get('/skonsulta/track', [App\Http\Controllers\Admin\ConsultationController::class, 'showTracker'])->name('skonsulta.track');
+Route::post('/consultations', [App\Http\Controllers\Admin\ConsultationController::class, 'store'])->middleware('throttle:6,1')->name('consultations.store');
+Route::get('/consultations/track', [App\Http\Controllers\Admin\ConsultationController::class, 'track'])->name('consultations.track');
+
 // Tracking Requests
 Route::get('/track', [TrackRequestController::class, 'index'])->name('track.index');
 Route::post('/track', [TrackRequestController::class, 'search'])->name('track.search');
@@ -87,12 +93,8 @@ Route::middleware(['auth', 'throttle:forms'])->group(function () {
     })->name('forms.silid.store');
 
     Route::middleware('kk.profile.completed')->group(function () {
-        Route::get('/forms/sports-registration', function() {
-            return view('forms.sports-registration');
-        })->name('forms.sports.create');
-        Route::post('/forms/sports-registration', function() {
-            return redirect()->route('projects.index');
-        })->name('forms.sports.store');
+        Route::get('/forms/sports-registration', [\App\Http\Controllers\SportsRegistrationController::class, 'showRegistrationForm'])->name('forms.sports.create');
+        Route::post('/forms/sports-registration', [\App\Http\Controllers\SportsRegistrationController::class, 'submitRegistration'])->name('forms.sports.store');
     });
 });
 
@@ -134,6 +136,11 @@ Route::middleware(['auth', 'admin.staff'])->group(function () {
     Route::post('/dashboard/profiling/{id}/restore', [KkProfileController::class, 'restore'])->name('dashboard.profiling.restore');
     Route::patch('/dashboard/profiling/{profile}/approve', [KkProfileController::class, 'approve'])->name('dashboard.profiling.approve');
     Route::patch('/dashboard/profiling/{profile}/decline', [KkProfileController::class, 'decline'])->name('dashboard.profiling.decline');
+
+    // Consultation Management (SKONSULTA)
+    Route::get('/dashboard/consultations', [App\Http\Controllers\Admin\ConsultationController::class, 'index'])->name('admin.consultations.index');
+    Route::patch('/dashboard/consultations/{consultation}/status', [App\Http\Controllers\Admin\ConsultationController::class, 'updateStatus'])->name('admin.consultations.update-status');
+    Route::post('/dashboard/consultations/{consultation}/reply', [App\Http\Controllers\Admin\ConsultationController::class, 'reply'])->name('admin.consultations.reply');
 });
 
 // Admin and Superadmin Actions (Middleware: auth, admin.dpo)
@@ -218,6 +225,10 @@ Route::middleware(['auth', 'admin.only'])->group(function () {
     Route::delete('/admin/structure/initiatives/{id}/force-delete', [StructureManagementController::class, 'forceDeleteInitiative'])->name('admin.structure.initiative.force-delete');
     Route::get('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'edit'])->name('admin.structure.form-builder.edit');
     Route::put('/admin/structure/initiatives/{initiative}/form-builder', [FormBuilderController::class, 'update'])->name('admin.structure.form-builder.update');
+
+    // Dynamic Sports Form Builder
+    Route::get('/admin/sports-league/form-builder/create', [\App\Http\Controllers\Admin\SportsLeague\SportsFormBuilderController::class, 'create'])->name('admin.sports-league.form-builder.create');
+    Route::post('/admin/sports-league/form-builder', [\App\Http\Controllers\Admin\SportsLeague\SportsFormBuilderController::class, 'store'])->name('admin.sports-league.form-builder.store');
 
     // Unified Audit Logs
     Route::get('/admin/logs', [UnifiedAuditLogController::class, 'index'])->name('admin.logs.index');

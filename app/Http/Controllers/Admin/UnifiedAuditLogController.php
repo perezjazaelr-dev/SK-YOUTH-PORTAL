@@ -74,7 +74,7 @@ class UnifiedAuditLogController extends Controller
             $years = [date('Y')];
         }
 
-        return view('admin.logs.index', compact(
+        return view('admin.audit-logs.index', compact(
             'logs', 'search', 'actionFilter', 'uniqueActions', 'yearFilter', 'limit', 'years', 'type'
         ));
     }

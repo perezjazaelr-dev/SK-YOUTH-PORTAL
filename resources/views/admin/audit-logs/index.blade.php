@@ -39,7 +39,7 @@
                     <span class="text-[10px] font-black {{ $type === 'dpo' ? 'text-emerald-600 dark:text-emerald-400' : 'text-[#1e40af] dark:text-blue-400' }} uppercase tracking-widest block font-display">
                         {{ $type === 'dpo' ? 'Data Privacy Office' : 'System Integrity' }}
                     </span>
-                    <span class="px-2 py-0.5 {{ $type === 'dpo' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30' : 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400 border-blue-100 dark:border-blue-900/30' }} rounded-md text-[9px] font-bold uppercase font-mono border">
+                    <span class="px-2 py-0.5 {{ $type === 'dpo' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-450 border-emerald-100 dark:border-emerald-900/30' : 'bg-blue-50 dark:bg-blue-950/40 text-[#1e40af] dark:text-blue-400 border-blue-100 dark:border-blue-900/30' }} rounded-md text-[9px] font-bold uppercase font-mono border">
                         {{ $logs->total() }} Log Entries
                     </span>
                 </div>
@@ -52,7 +52,7 @@
                         : 'Review activity trails of authentication events, user updates, structure edits, logo assets changes, and request lifecycles.' }}
                 </p>
                 <div class="pt-2">
-                    @include('admin.logs.partials.dpo-export-modal')
+                    @include('admin.audit-logs.partials.dpo-export-modal')
                 </div>
             </div>
 
@@ -60,11 +60,11 @@
             <div class="border-b border-slate-200 dark:border-slate-800">
                 <nav class="flex space-x-6" aria-label="Tabs">
                     <a href="{{ route('admin.logs.index', ['type' => 'system']) }}" 
-                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all duration-150 {{ $type === 'system' ? 'border-[#1e40af] text-[#1e40af] dark:border-blue-500 dark:text-blue-400' : 'border-transparent text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700' }}">
+                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all duration-150 {{ $type === 'system' ? 'border-[#1e40af] text-[#1e40af] dark:border-blue-500 dark:text-blue-450' : 'border-transparent text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 hover:border-slate-300 dark:hover:border-slate-700' }}">
                         System Logs
                     </a>
                     <a href="{{ route('admin.logs.index', ['type' => 'dpo']) }}" 
-                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all duration-150 {{ $type === 'dpo' ? 'border-emerald-600 text-emerald-600 dark:border-emerald-500 dark:text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700' }}">
+                       class="border-b-2 pb-3 px-1 text-xs font-black uppercase tracking-wider transition-all duration-150 {{ $type === 'dpo' ? 'border-emerald-600 text-emerald-600 dark:border-emerald-500 dark:text-emerald-400' : 'border-transparent text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 hover:border-slate-300 dark:hover:border-slate-700' }}">
                         DPO Logs
                     </a>
                 </nav>
@@ -135,7 +135,7 @@
                                 <select 
                                     name="limit" 
                                     onchange="this.form.submit()"
-                                    class="block w-full py-2 pl-3 pr-8 bg-slate-50/70 dark:bg-slate-955/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl text-[11px] text-slate-600 dark:text-slate-405 outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-[#1e40af] dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-600/5 transition cursor-pointer appearance-none font-semibold"
+                                    class="block w-full py-2 pl-3 pr-8 bg-slate-50/70 dark:bg-slate-955/40 border border-slate-200/60 dark:border-slate-800 rounded-2xl text-[11px] text-slate-600 dark:text-slate-400 outline-none focus:bg-white dark:focus:bg-slate-950 focus:border-[#1e40af] dark:focus:border-blue-500 focus:ring-4 focus:ring-blue-600/5 transition cursor-pointer appearance-none font-semibold"
                                 >
                                     <option value="10" {{ $limit == 10 ? 'selected' : '' }}>10 rows</option>
                                     <option value="20" {{ $limit == 20 ? 'selected' : '' }}>20 rows</option>
@@ -151,7 +151,7 @@
                             <!-- Reset Filter Link -->
                             @if($search || $actionFilter || $yearFilter || $limit != 20)
                                 <a href="{{ route('admin.logs.index', ['type' => $type]) }}" 
-                                   class="inline-flex items-center text-[11px] font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition space-x-1 select-none cursor-pointer pl-2 py-1.5"
+                                   class="inline-flex items-center text-[11px] font-bold text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 transition space-x-1 select-none cursor-pointer pl-2 py-1.5"
                                 >
                                     <svg class="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H18v3.582"></path></svg>
                                     <span>Reset Filter</span>
@@ -173,7 +173,7 @@
                         <div class="w-16 h-16 bg-slate-50 dark:bg-slate-950 text-slate-400 dark:text-slate-600 border border-slate-100 dark:border-slate-800 rounded-3xl flex items-center justify-center mx-auto text-2xl">📋</div>
                         <div>
                             <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">No Activity Logged</h3>
-                            <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 max-w-sm mx-auto">Either no actions match your filter criteria or no system events have occurred yet.</p>
+                            <p class="text-xs text-slate-400 dark:text-slate-550 mt-1 max-w-sm mx-auto">Either no actions match your filter criteria or no system events have occurred yet.</p>
                         </div>
                     </div>
                 @else
@@ -196,7 +196,7 @@
                                         $badgeColor = match(true) {
                                             str_contains($log->action, 'created') || str_contains($log->action, 'registered') => 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-150 dark:border-emerald-900/30',
                                             str_contains($log->action, 'updated') || $log->action === 'status_changed' => 'bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 border-amber-150 dark:border-amber-900/30',
-                                            str_contains($log->action, 'deleted') || str_contains($log->action, 'cancelled') || str_contains($log->action, 'failed') => 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-400 border-rose-150 dark:border-rose-900/30',
+                                            str_contains($log->action, 'deleted') || str_contains($log->action, 'cancelled') || str_contains($log->action, 'failed') => 'bg-rose-50 dark:bg-rose-955/40 text-rose-700 dark:text-rose-455 border-rose-150 dark:border-rose-900/30',
                                             $log->action === 'pii_accessed' => 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border-indigo-150 dark:border-indigo-900/30',
                                             default => 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border-blue-150 dark:border-blue-900/30'
                                         };
@@ -212,7 +212,7 @@
                                         <!-- Timestamp -->
                                         <td class="p-4 pl-6 text-slate-500 dark:text-slate-400 font-mono whitespace-nowrap">
                                             {{ $log->created_at->format('Y-m-d H:i:s') }}
-                                            <span class="text-[10px] text-slate-400 dark:text-slate-500 block">{{ $log->created_at->diffForHumans() }}</span>
+                                            <span class="text-[10px] text-slate-400 dark:text-slate-555 block">{{ $log->created_at->diffForHumans() }}</span>
                                         </td>
                                         <!-- Action -->
                                         <td class="p-4 whitespace-nowrap">
@@ -221,16 +221,16 @@
                                             </span>
                                         </td>
                                         <!-- Target -->
-                                        <td class="p-4 font-mono text-slate-600 dark:text-slate-400 hidden md:table-cell">
+                                        <td class="p-4 font-mono text-slate-600 dark:text-slate-450 hidden md:table-cell">
                                             {{ $subjectDisplay }}
                                         </td>
                                         <!-- Actor -->
                                         <td class="p-4">
                                             @if($log->user)
                                                 <span class="font-bold text-slate-800 dark:text-slate-200">{{ $log->user->name }}</span>
-                                                <span class="text-[10px] text-slate-400 dark:text-slate-500 block font-mono">{{ $log->user->email }}</span>
+                                                <span class="text-[10px] text-slate-400 dark:text-slate-550 block font-mono">{{ $log->user->email }}</span>
                                             @else
-                                                <span class="text-slate-400 dark:text-slate-550 italic">Guest / System</span>
+                                                <span class="text-slate-400 dark:text-slate-500 italic">Guest / System</span>
                                             @endif
                                         </td>
                                         <!-- IP Address -->
@@ -313,7 +313,7 @@
                 <div class="grid grid-cols-2 gap-4 bg-slate-50 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <div>
                         <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block font-display">Event Action</span>
-                        <span class="font-extrabold text-[#1e40af] dark:text-blue-400 text-[11px] uppercase tracking-wide" x-text="selectedLog ? selectedLog.action.replace('_', ' ') : ''"></span>
+                        <span class="font-extrabold text-[#1e40af] dark:text-blue-450 text-[11px] uppercase tracking-wide" x-text="selectedLog ? selectedLog.action.replace('_', ' ') : ''"></span>
                     </div>
                     <div>
                         <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 block font-display">Timestamp</span>

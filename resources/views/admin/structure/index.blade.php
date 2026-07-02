@@ -14,10 +14,10 @@
 
 <div x-data="{ 
     mobileSidebar: false, 
-    activeCommitteeId: 'all', 
+    activeCommitteeId: sessionStorage.getItem('activeCommitteeId') || 'all', 
     showAddCommittee: false, 
     showAddInitiative: false, 
-    activeAdminTab: 'structure',
+    activeAdminTab: sessionStorage.getItem('activeAdminTab') || 'structure',
     showEditInitiative: false,
     editInitiative: { id: null, title: '', description: '', form_route: '', custom_fields: [], is_coming_soon: false, show_in_quick_forms: false },
     addInitiative: { title: '', description: '', custom_fields: [] },
@@ -36,7 +36,12 @@
         };
         this.showEditInitiative = true;
     }
-}" class="flex-1 flex flex-col md:flex-row bg-[#f8fafc]">
+}" 
+x-init="
+    $watch('activeAdminTab', val => sessionStorage.setItem('activeAdminTab', val));
+    $watch('activeCommitteeId', val => sessionStorage.setItem('activeCommitteeId', val));
+"
+class="flex-1 flex flex-col md:flex-row bg-[#f8fafc]">
 
     <!-- Left Sidebar -->
     @include('layouts.dashboard-sidebar')
@@ -164,7 +169,8 @@
 
             <!-- Archive tab content -->
             <div x-show="activeAdminTab === 'archive'" 
-                 x-data="{ archiveSubTab: 'committees' }"
+                 x-data="{ archiveSubTab: sessionStorage.getItem('archiveSubTab') || 'committees' }"
+                 x-init="$watch('archiveSubTab', val => sessionStorage.setItem('archiveSubTab', val))"
                  x-transition:enter="transition ease-out duration-250"
                  x-transition:enter-start="opacity-0 transform translate-y-2"
                  x-transition:enter-end="opacity-100 transform translate-y-0"
@@ -956,4 +962,18 @@
     </div>
 
 </div>
+
+<script>
+    window.addEventListener('beforeunload', () => {
+        sessionStorage.setItem('structureScrollPosition', window.scrollY);
+    });
+    document.addEventListener('DOMContentLoaded', () => {
+        const scrollPosition = sessionStorage.getItem('structureScrollPosition');
+        if (scrollPosition) {
+            setTimeout(() => {
+                window.scrollTo(0, parseInt(scrollPosition));
+            }, 100);
+        }
+    });
+</script>
 @endsection
